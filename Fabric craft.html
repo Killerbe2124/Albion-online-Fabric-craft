@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0f0f1a" />
+<title>🧶 Крафт ткани — Калькулятор Albion Online</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#0f0f1a;
+    --bg-2:#1a1a2e;
+    --panel:rgba(26, 26, 46, .82);
+    --panel-2:rgba(35, 35, 60, .75);
+    --gold:#d4a843;
+    --gold-bright:#f0c040;
+    --gold-dim:rgba(212, 168, 67, .18);
+    --text:#cfd2dc;
+    --text-strong:#eef0f6;
+    --muted:#8b90a4;
+    --green:#4fd18b;
+    --red:#f06070;
+    --radius:16px;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{box-sizing:border-box}
+
+  [hidden]{display:none !important}
+
+  html,body{height:100%}
+
+  body{
+    margin:0;
+    padding:32px 16px 56px;
+    font-family:'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+    color:var(--text);
+    background-color:var(--bg);
+    background-image:
+      radial-gradient(1100px 600px at 12% -10%, rgba(212,168,67,.13), transparent 60%),
+      radial-gradient(900px 520px at 92% 4%, rgba(88,120,255,.10), transparent 62%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 55%, #0d0d18 100%);
+    background-attachment:fixed;
+    min-height:100%;
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.5;
+    background-image:
+      repeating-linear-gradient(45deg, rgba(255,255,255,.014) 0 2px, transparent 2px 5px),
+      repeating-linear-gradient(-45deg, rgba(0,0,0,.05) 0 2px, transparent 2px 5px);
+    z-index:0;
+  }
+
+  .wrap{
+    position:relative;
+    z-index:1;
+    max-width:960px;
+    margin:0 auto;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    text-align:center;
+    margin-bottom:26px;
+  }
+  .crest{
+    font-size:44px;
+    line-height:1;
+    display:inline-block;
+    filter:drop-shadow(0 6px 16px rgba(240,192,64,.35));
+    animation:float 5s var(--ease) infinite;
+  }
+  @keyframes float{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-6px)}
+  }
+  .hero h1{
+    font-family:'Cinzel', 'Times New Roman', serif;
+    font-weight:700;
+    font-size:clamp(26px, 5vw, 40px);
+    letter-spacing:.06em;
+    margin:10px 0 6px;
+    text-transform:uppercase;
+    background:linear-gradient(180deg, #fbe9ae 0%, var(--gold-bright) 45%, #b8862c 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-shadow:0 2px 18px rgba(212,168,67,.22);
+  }
+  .hero .sub{
+    margin:0;
+    color:var(--muted);
+    font-size:14px;
+    letter-spacing:.04em;
+  }
+  .rule{
+    height:1px;
+    margin:18px auto 0;
+    max-width:420px;
+    background:linear-gradient(90deg, transparent, var(--gold-dim), rgba(212,168,67,.55), var(--gold-dim), transparent);
+  }
+
+  /* ---------- PANELS ---------- */
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--gold-dim);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:20px 20px 22px;
+    backdrop-filter:blur(8px);
+    margin-bottom:20px;
+    transition:border-color .25s var(--ease), box-shadow .25s var(--ease);
+  }
+  .panel-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .panel-head h2{
+    font-family:'Cinzel', serif;
+    font-size:16px;
+    font-weight:600;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:0;
+  }
+
+  /* ---------- RESOURCE SWITCH ---------- */
+  .resource-switch{
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0,1fr));
+    gap:6px;
+    padding:6px;
+    background:rgba(12,12,24,.7);
+    border:1px solid rgba(212,168,67,.12);
+    border-radius:12px;
+    margin-bottom:20px;
+  }
+  .res{
+    appearance:none;
+    border:1px solid transparent;
+    background:transparent;
+    color:var(--muted);
+    font-family:inherit;
+    font-size:13px;
+    font-weight:600;
+    padding:10px 6px;
+    border-radius:9px;
+    cursor:pointer;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    transition:all .22s var(--ease);
+  }
+  .res:hover{color:var(--text-strong);background:rgba(212,168,67,.08)}
+  .res.active{
+    color:#20180a;
+    background:linear-gradient(180deg, var(--gold-bright), var(--gold));
+    box-shadow:0 6px 18px rgba(212,168,67,.28);
+  }
+
+  /* ---------- FORM ---------- */
+  .grid-form{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0,1fr));
+    gap:14px 16px;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    min-width:0;
+  }
+  .field-label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .field-label .ico{font-size:15px}
+
+  .input-wrap{
+    position:relative;
+    display:block;
+  }
+  .input-wrap input,
+  .input-wrap select{
+    width:100%;
+    padding:12px 74px 12px 14px;
+    font-family:inherit;
+    font-size:16px;
+    font-weight:600;
+    color:var(--text-strong);
+    background:var(--panel-2);
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:11px;
+    outline:none;
+    transition:border-color .22s var(--ease), box-shadow .22s var(--ease), background .22s var(--ease), transform .22s var(--ease);
+  }
+  .input-wrap select{
+    appearance:none;
+    cursor:pointer;
+    padding-right:38px;
+  }
+  .input-wrap input::placeholder{color:#5d6277;font-weight:500}
+  .input-wrap input:hover,
+  .input-wrap select:hover{border-color:rgba(212,168,67,.35)}
+  .input-wrap input:focus,
+  .input-wrap select:focus{
+    border-color:var(--gold);
+    background:rgba(42,42,70,.95);
+    box-shadow:0 0 0 3px rgba(212,168,67,.16), 0 0 22px rgba(212,168,67,.12);
+  }
+  .input-wrap input[type=number]::-webkit-outer-spin-button,
+  .input-wrap input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .input-wrap input[type=number]{-moz-appearance:textfield}
+
+  .unit{
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+    pointer-events:none;
+  }
+  .select-wrap::after{
+    content:"▾";
+    position:absolute;
+    right:14px;
+    top:50%;
+    transform:translateY(-50%);
+    color:var(--gold);
+    font-size:13px;
+    pointer-events:none;
+  }
+
+  /* ---------- FOCUS SWITCH ---------- */
+  .focus-row{
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px dashed rgba(212,168,67,.16);
+  }
+  .switch{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .switch input{position:absolute;opacity:0;width:0;height:0}
+  .track{
+    flex:0 0 auto;
+    width:52px;
+    height:28px;
+    border-radius:999px;
+    background:rgba(12,12,24,.85);
+    border:1px solid rgba(255,255,255,.1);
+    position:relative;
+    transition:all .25s var(--ease);
+  }
+  .thumb{
+    position:absolute;
+    top:3px;
+    left:3px;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:#6d7288;
+    transition:all .25s var(--ease);
+  }
+  .switch input:checked + .track{
+    background:linear-gradient(135deg,#8a6d1f, var(--gold));
+    border-color:var(--gold);
+    box-shadow:0 0 16px rgba(212,168,67,.3);
+  }
+  .switch input:checked + .track .thumb{
+    transform:translateX(24px);
+    background:#fff6dc;
+  }
+  .switch input:focus-visible + .track{outline:2px solid var(--gold);outline-offset:3px}
+  .switch-text{
+    font-size:14px;
+    color:var(--text);
+    line-height:1.4;
+  }
+  .switch-text em{
+    display:block;
+    font-style:normal;
+    font-size:12px;
+    color:var(--muted);
+    margin-top:2px;
+  }
+
+  .btn-ghost{
+    appearance:none;
+    font-family:inherit;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--gold);
+    background:rgba(212,168,67,.08);
+    border:1px solid rgba(212,168,67,.3);
+    padding:9px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:all .22s var(--ease);
+  }
+  .btn-ghost:hover{
+    background:rgba(212,168,67,.18);
+    border-color:var(--gold);
+    color:var(--gold-bright);
+    transform:translateY(-1px);
+  }
+  .btn-ghost:active{transform:translateY(0) scale(.98)}
+
+  /* ---------- RESULTS ---------- */
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--text);
+    background:rgba(12,12,24,.6);
+    border:1px solid rgba(212,168,67,.2);
+    border-radius:999px;
+    padding:5px 11px;
+    white-space:nowrap;
+  }
+  .chip.gold{color:var(--gold-bright);border-color:rgba(212,168,67,.45)}
+
+  .empty{
+    text-align:center;
+    color:var(--muted);
+    font-size:14px;
+    padding:34px 12px;
+    border:1px dashed rgba(212,168,67,.18);
+    border-radius:12px;
+    background:rgba(12,12,24,.35);
+  }
+
+  .results-grid{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0,1fr));
+    gap:12px;
+  }
+  .card{
+    position:relative;
+    background:linear-gradient(160deg, rgba(38,38,66,.85), rgba(22,22,40,.9));
+    border:1px solid rgba(212,168,67,.14);
+    border-radius:13px;
+    padding:14px 14px 15px;
+    overflow:hidden;
+    transition:transform .25s var(--ease), border-color .25s var(--ease), box-shadow .25s var(--ease);
+  }
+  .card::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:radial-gradient(140px 90px at 88% 0%, rgba(240,192,64,.14), transparent 70%);
+    opacity:0;
+    transition:opacity .3s var(--ease);
+    pointer-events:none;
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(212,168,67,.5);
+    box-shadow:0 14px 28px rgba(0,0,0,.5), 0 0 0 1px rgba(212,168,67,.12);
+  }
+  .card:hover::after{opacity:1}
+
+  .card-icon{font-size:19px;line-height:1;margin-bottom:8px}
+  .card-label{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:7px;
+  }
+  .card-value{
+    font-family:'Cinzel', serif;
+    font-weight:600;
+    font-size:clamp(19px, 3.4vw, 24px);
+    color:var(--gold-bright);
+    line-height:1.15;
+    word-break:break-word;
+  }
+  .card-sub{
+    font-size:11.5px;
+    color:var(--muted);
+    margin-top:6px;
+    line-height:1.35;
+  }
+  .card.pos .card-value{color:var(--green);text-shadow:0 0 18px rgba(79,209,139,.25)}
+  .card.neg .card-value{color:var(--red);text-shadow:0 0 18px rgba(240,96,112,.22)}
+  .card.wide{grid-column:span 3}
+
+  .results-grid.in .card{animation:cardIn .5s var(--ease) both}
+  .results-grid.in .card:nth-child(1){animation-delay:.02s}
+  .results-grid.in .card:nth-child(2){animation-delay:.06s}
+  .results-grid.in .card:nth-child(3){animation-delay:.1s}
+  .results-grid.in .card:nth-child(4){animation-delay:.14s}
+  .results-grid.in .card:nth-child(5){animation-delay:.18s}
+  .results-grid.in .card:nth-child(6){animation-delay:.22s}
+  @keyframes cardIn{
+    from{opacity:0;transform:translateY(14px) scale(.98)}
+    to{opacity:1;transform:none}
+  }
+
+  /* ---------- TIP ---------- */
+  .tip{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    margin-top:16px;
+    padding:16px 18px;
+    border-radius:13px;
+    border:1px solid rgba(240,192,64,.45);
+    border-left:4px solid var(--gold-bright);
+    background:linear-gradient(120deg, rgba(212,168,67,.16), rgba(212,168,67,.05) 60%, transparent);
+    box-shadow:0 0 26px rgba(212,168,67,.1) inset;
+    animation:tipIn .45s var(--ease) both;
+  }
+  @keyframes tipIn{
+    from{opacity:0;transform:translateY(10px)}
+    to{opacity:1;transform:none}
+  }
+  .tip .tip-ico{
+    font-size:24px;
+    line-height:1;
+    filter:drop-shadow(0 3px 10px rgba(240,192,64,.45));
+  }
+  .tip .tip-title{
+    font-family:'Cinzel', serif;
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold-bright);
+    margin-bottom:5px;
+  }
+  .tip .tip-text{
+    font-size:13.5px;
+    line-height:1.55;
+    color:var(--text);
+  }
+  .tip .tip-text strong{color:var(--gold-bright);font-weight:700}
+  .tip .tip-text .bad{color:var(--red);font-weight:700}
+  .tip .tip-text .good{color:var(--green);font-weight:700}
+
+  .foot{
+    text-align:center;
+    color:#5d6277;
+    font-size:11.5px;
+    letter-spacing:.05em;
+    margin-top:6px;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:760px){
+    body{padding:20px 12px 40px}
+    .panel{padding:16px 14px 18px}
+    .grid-form{grid-template-columns:1fr}
+    .results-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+    .card.wide{grid-column:span 2}
+    .resource-switch{grid-template-columns:repeat(2, minmax(0,1fr))}
+    .card-value{font-size:19px}
+    .panel-head h2{font-size:14px}
+  }
+  @media (max-width:380px){
+    .results-grid{grid-template-columns:1fr}
+    .card.wide{grid-column:span 1}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="crest">🧶</div>
+    <h1>Крафт ткани</h1>
+    <p class="sub">Albion Online · калькулятор рентабельности переработки</p>
+    <div class="rule"></div>
+  </header>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Параметры расчёта</h2>
+      <button class="btn-ghost" id="resetBtn" type="button">↺ Сбросить</button>
+    </div>
+
+    <div class="resource-switch" id="resourceSwitch" role="tablist" aria-label="Тип ресурса">
+      <button class="res active" type="button" data-res="cotton">🧶 Хлопок</button>
+      <button class="res" type="button" data-res="flax">🌾 Лён</button>
+      <button class="res" type="button" data-res="hide">🐄 Кожа</button>
+      <button class="res" type="button" data-res="ore">⛏️ Металл</button>
+    </div>
+
+    <div class="grid-form">
+      <label class="field">
+        <span class="field-label"><span class="ico">💰</span><span id="buyLabel">Цена хлопка</span></span>
+        <span class="input-wrap">
+          <input type="number" id="buyPrice" value="4300" min="0" step="10" inputmode="decimal" placeholder="0">
+          <span class="unit">серебро</span>
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="field-label"><span class="ico">🏷️</span><span id="sellLabel">Цена ткани при продаже</span></span>
+        <span class="input-wrap">
+          <input type="number" id="sellPrice" value="9400" min="0" step="10" inputmode="decimal" placeholder="0">
+          <span class="unit">серебро</span>
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="field-label"><span class="ico">📦</span><span id="amountLabel">Количество хлопка</span></span>
+        <span class="input-wrap">
+          <input type="number" id="amount" value="2000" min="1" step="1" inputmode="numeric" placeholder="0">
+          <span class="unit">шт.</span>
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="field-label"><span class="ico">📊</span>Налог на продажу</span>
+        <span class="input-wrap select-wrap">
+          <select id="taxRate">
+            <option value="4.5">4.5% — с фокусировкой</option>
+            <option value="6.5">6.5% — премиум</option>
+            <option value="10.5" selected>10.5% — обычный</option>
+          </select>
+        </span>
+      </label>
+    </div>
+
+    <div class="focus-row">
+      <label class="switch">
+        <input type="checkbox" id="useFocus">
+        <span class="track"><span class="thumb"></span></span>
+        <span class="switch-text">
+          Использовать фокусировку
+          <em id="focusHint">возврат 53.9% вместо 36.5%</em>
+        </span>
+      </label>
+    </div>
+  </section>
+
+  <section class="panel" aria-live="polite">
+    <div class="panel-head">
+      <h2>Результаты</h2>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="empty" id="emptyState">Заполните все поля, чтобы увидеть расчёт</div>
+
+    <div class="results-grid" id="resultsGrid" hidden>
+      <div class="card" id="cardCloth">
+        <div class="card-icon">🧵</div>
+        <div class="card-label">Произведено</div>
+        <div class="card-value" id="vCloth">0</div>
+        <div class="card-sub" id="sCloth">единиц</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">💰</div>
+        <div class="card-label">Затраты на сырьё</div>
+        <div class="card-value" id="vCost">0</div>
+        <div class="card-sub">серебра · полный закуп</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">📈</div>
+        <div class="card-label">Доход от продажи</div>
+        <div class="card-value" id="vRevenue">0</div>
+        <div class="card-sub" id="sRevenue">серебра · после налога</div>
+      </div>
+
+      <div class="card" id="cardProfit">
+        <div class="card-icon" id="iProfit">✅</div>
+        <div class="card-label">Чистая прибыль</div>
+        <div class="card-value" id="vProfit">0</div>
+        <div class="card-sub" id="sProfit">серебра</div>
+      </div>
+
+      <div class="card" id="cardPer">
+        <div class="card-icon">📊</div>
+        <div class="card-label">Прибыль за единицу</div>
+        <div class="card-value" id="vPer">0</div>
+        <div class="card-sub" id="sPer">серебра / единица</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">♻️</div>
+        <div class="card-label">Неиспользовано</div>
+        <div class="card-value" id="vLeft">0</div>
+        <div class="card-sub" id="sLeft">эквивалент сырья</div>
+      </div>
+    </div>
+
+    <div class="tip" id="tipBlock" hidden>
+      <div class="tip-ico">💡</div>
+      <div>
+        <div class="tip-title">Совет по оптимизации</div>
+        <div class="tip-text" id="tipText"></div>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">Расчёт носит оценочный характер · данные рынка вводите вручную</p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  var RESOURCES = {
+    cotton: { out: "Ткань", buyLabel: "Цена хлопка", sellLabel: "Цена ткани при продаже", amountLabel: "Количество хлопка", unit: "Тканей", perUnit: 2 },
+    flax:   { out: "Льняное полотно", buyLabel: "Цена льна", sellLabel: "Цена полотна при продаже", amountLabel: "Количество льна", unit: "Полотна", perUnit: 3 },
+    hide:   { out: "Выделанная кожа", buyLabel: "Цена сырой кожи", sellLabel: "Цена кожи при продаже", amountLabel: "Количество кожи", unit: "Кожи", perUnit: 4 },
+    ore:    { out: "Металлический слиток", buyLabel: "Цена руды", sellLabel: "Цена слитка при продаже", amountLabel: "Количество руды", unit: "Слитков", perUnit: 5 }
+  };
+
+  var REFUND = { base: 36.5, focus: 53.9 };
+
+  var state = { res: "cotton", focus: false };
+
+  var fmtInt = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
+  var fmtDec = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  var animations = new WeakMap();
+
+  function num(value) {
+    var n = parseFloat(String(value).replace(",", "."));
+    return isFinite(n) ? n : 0;
+  }
+
+  function animateNumber(el, target, formatter) {
+    if (animations.has(el)) cancelAnimationFrame(animations.get(el));
+    var from = Number(el.dataset.value || 0);
+    var duration = 550;
+
+    if (el.dataset.value === undefined || Math.abs(target - from) < 0.005) {
+      el.dataset.value = target;
+      el.textContent = formatter(target);
+      return;
+    }
+
+    var start = performance.now();
+    var ease = function (t) { return 1 - Math.pow(1 - t, 3); };
+
+    function step(now) {
+      var p = Math.min(1, (now - start) / duration);
+      var v = from + (target - from) * ease(p);
+      el.dataset.value = v;
+      el.textContent = formatter(v);
+      if (p < 1) {
+        animations.set(el, requestAnimationFrame(step));
+      } else {
+        el.dataset.value = target;
+        el.textContent = formatter(target);
+        animations.delete(el);
+      }
+    }
+    animations.set(el, requestAnimationFrame(step));
+  }
+
+  function setText(el, text) { el.textContent = text; }
+
+  function applyResourceLabels() {
+    var r = RESOURCES[state.res];
+    setText($("buyLabel"), r.buyLabel);
+    setText($("sellLabel"), r.sellLabel);
+    setText($("amountLabel"), r.amountLabel);
+    setText($("sCloth"), "единиц · " + r.out.toLowerCase());
+    setText($("focusHint"), "возврат " + REFUND.focus + "% вместо " + REFUND.base + "%");
+  }
+
+  function showEmpty() {
+    $("emptyState").hidden = false;
+    $("resultsGrid").hidden = true;
+    $("resultsGrid").classList.remove("in");
+    $("tipBlock").hidden = true;
+    $("chips").innerHTML = "";
+  }
+
+  function renderChips(tax, refund) {
+    var r = RESOURCES[state.res];
+    var out = [
+      '<span class="chip gold">' + r.buyLabel.replace("Цена ", "") + " → " + r.out + "</span>",
+      '<span class="chip">Налог ' + tax + "%</span>",
+      '<span class="chip">Возврат ' + refund + "%</span>",
+      '<span class="chip">' + (state.focus ? "🧠 Фокусировка" : "Без фокусировки") + "</span>",
+      '<span class="chip">Рецепт ' + r.perUnit + " : 1</span>"
+    ];
+    $("chips").innerHTML = out.join("");
+  }
+
+  function buildTip(d) {
+    if (d.produced <= 0) {
+      var need = Math.ceil(d.effectivePerUnit);
+      return "Закупите минимум <strong>" + fmtInt.format(need) + "</strong> ед. сырья, чтобы получить первую единицу «" + d.res.out + "».";
+    }
+    var text = "Чтобы получить <strong>" + fmtInt.format(d.produced) + "</strong> ед. «" + d.res.out + "» с минимальными потерями, " +
+      "закупайте ровно <strong>" + fmtInt.format(d.optimal) + "</strong> ед. сырья вместо " + fmtInt.format(d.amount) + ".";
+
+    if (d.leftEff > 0.0001) {
+      text += " Сейчас в остатке <span class=\"bad\">" + fmtDec.format(d.leftEff) + " экв.</span> " +
+        "(выброшено ≈ <strong>" + fmtInt.format(d.lostValue) + "</strong> серебра).";
+    } else {
+      text += " Потерь сырья нет — партия подобрана идеально.";
+    }
+
+    if (d.profit > 0) {
+      text += " Маржа составляет <span class=\"good\">" + fmtDec.format(d.margin) + "%</span> — крафт прибыльный.";
+    } else {
+      text += " Маржа <span class=\"bad\">" + fmtDec.format(d.margin) + "%</span> — при таких ценах крафт убыточен.";
+    }
+    return text;
+  }
+
+  function calculate(animate) {
+    var r = RESOURCES[state.res];
+    var buy = num($("buyPrice").value);
+    var sell = num($("sellPrice").value);
+    var amount = Math.floor(num($("amount").value));
+    var tax = num($("taxRate").value);
+    var refund = state.focus ? REFUND.focus : REFUND.base;
+
+    if (buy <= 0 || sell <= 0 || amount <= 0) {
+      showEmpty();
+      return;
+    }
+
+    var effectivePerUnit = r.perUnit * (1 - refund / 100);
+    var produced = Math.floor(amount / effectivePerUnit);
+    var usedEff = produced * effectivePerUnit;
+    var leftEff = amount - usedEff;
+    var lostValue = leftEff * buy;
+
+    var totalCost = amount * buy;
+    var revenue = produced * sell * (1 - tax / 100);
+    var profit = revenue - totalCost;
+    var perUnit = produced > 0 ? profit / produced : 0;
+    var margin = totalCost > 0 ? (profit / totalCost) * 100 : 0;
+    var optimal = Math.max(1, Math.ceil(produced * effectivePerUnit));
+
+    var wasHidden = $("resultsGrid").hidden;
+    $("emptyState").hidden = true;
+    $("resultsGrid").hidden = false;
+    $("tipBlock").hidden = false;
+
+    if (wasHidden) {
+      $("resultsGrid").classList.remove("in");
+      void $("resultsGrid").offsetWidth;
+      $("resultsGrid").classList.add("in");
+    }
+
+    if (!animate) {
+      $("vCloth").dataset.value = produced;
+      $("vCloth").textContent = fmtInt.format(produced);
+      $("vCost").dataset.value = totalCost;
+      $("vCost").textContent = fmtInt.format(totalCost);
+      $("vRevenue").dataset.value = revenue;
+      $("vRevenue").textContent = fmtInt.format(revenue);
+      $("vProfit").dataset.value = profit;
+      $("vProfit").textContent = fmtInt.format(profit);
+      $("vPer").dataset.value = perUnit;
+      $("vPer").textContent = fmtInt.format(perUnit);
+      $("vLeft").dataset.value = leftEff;
+      $("vLeft").textContent = fmtDec.format(leftEff);
+    } else {
+      animateNumber($("vCloth"), produced, function (v) { return fmtInt.format(v); });
+      animateNumber($("vCost"), totalCost, function (v) { return fmtInt.format(v); });
+      animateNumber($("vRevenue"), revenue, function (v) { return fmtInt.format(v); });
+      animateNumber($("vProfit"), profit, function (v) { return fmtInt.format(v); });
+      animateNumber($("vPer"), perUnit, function (v) { return fmtInt.format(v); });
+      animateNumber($("vLeft"), leftEff, function (v) { return fmtDec.format(v); });
+    }
+
+    var profitPositive = profit >= 0;
+    $("cardProfit").classList.toggle("pos", profitPositive);
+    $("cardProfit").classList.toggle("neg", !profitPositive);
+    $("cardPer").classList.toggle("pos", perUnit >= 0);
+    $("cardPer").classList.toggle("neg", perUnit < 0);
+    $("iProfit").textContent = profitPositive ? "✅" : "⚠️";
+    setText($("sProfit"), "серебра · маржа " + fmtDec.format(margin) + "%");
+    setText($("sRevenue"), "серебра · налог " + tax + "%");
+    setText($("sPer"), "серебра / " + r.out.toLowerCase());
+    setText($("sLeft"), "эквивалент · потеря ≈ " + fmtInt.format(lostValue) + " серебра");
+
+    renderChips(tax, refund);
+    $("tipText").innerHTML = buildTip({
+      produced: produced,
+      optimal: optimal,
+      amount: amount,
+      leftEff: leftEff,
+      lostValue: lostValue,
+      profit: profit,
+      margin: margin,
+      effectivePerUnit: effectivePerUnit,
+      res: r
+    });
+
+    if (wasHidden) {
+      $("tipBlock").style.animation = "none";
+      void $("tipBlock").offsetWidth;
+      $("tipBlock").style.animation = "";
+    }
+  }
+
+  function resetAll() {
+    state.res = "cotton";
+    state.focus = false;
+    $("useFocus").checked = false;
+    $("buyPrice").value = "";
+    $("sellPrice").value = "";
+    $("amount").value = "";
+    $("taxRate").value = "10.5";
+
+    var buttons = document.querySelectorAll(".res");
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].classList.toggle("active", buttons[i].dataset.res === "cotton");
+    }
+
+    applyResourceLabels();
+    calculate(false);
+    $("buyPrice").focus();
+  }
+
+  document.getElementById("resourceSwitch").addEventListener("click", function (event) {
+    var btn = event.target.closest(".res");
+    if (!btn || btn.classList.contains("active")) return;
+    var buttons = this.querySelectorAll(".res");
+    for (var i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
+    btn.classList.add("active");
+    state.res = btn.dataset.res;
+    applyResourceLabels();
+    calculate(true);
+  });
+
+  $("useFocus").addEventListener("change", function () {
+    state.focus = this.checked;
+    $("taxRate").value = this.checked ? "4.5" : "10.5";
+    calculate(true);
+  });
+
+  ["buyPrice", "sellPrice", "amount", "taxRate"].forEach(function (id) {
+    $(id).addEventListener("input", function () { calculate(true); });
+    $(id).addEventListener("change", function () { calculate(true); });
+  });
+
+  $("resetBtn").addEventListener("click", resetAll);
+
+  applyResourceLabels();
+  calculate(false);
+})();
+</script>
+</body>
+</html>

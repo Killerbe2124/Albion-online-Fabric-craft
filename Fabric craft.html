@@ -482,6 +482,267 @@
     margin-top:6px;
   }
 
+  /* ---------- SAVE ACTION ---------- */
+  .actions{
+    margin-top:16px;
+    display:flex;
+    justify-content:center;
+  }
+  .btn-gold{
+    appearance:none;
+    font-family:'Cinzel', serif;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:#231a05;
+    background:linear-gradient(180deg, var(--gold-bright), #c39432);
+    border:1px solid rgba(255,236,178,.55);
+    padding:14px 30px;
+    border-radius:12px;
+    cursor:pointer;
+    box-shadow:0 10px 26px rgba(212,168,67,.22);
+    transition:transform .22s var(--ease), box-shadow .22s var(--ease), filter .22s var(--ease);
+  }
+  .btn-gold:hover{
+    transform:translateY(-2px);
+    box-shadow:0 16px 34px rgba(212,168,67,.32);
+    filter:brightness(1.06);
+  }
+  .btn-gold:active{transform:translateY(0) scale(.985);filter:brightness(.96)}
+  .btn-gold:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    transform:none;
+    box-shadow:none;
+    filter:grayscale(.3);
+  }
+
+  .btn-danger{
+    appearance:none;
+    font-family:inherit;
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:#ffdfe4;
+    background:linear-gradient(180deg, rgba(240,96,112,.9), rgba(190,58,74,.9));
+    border:1px solid rgba(255,180,190,.4);
+    padding:11px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:all .22s var(--ease);
+  }
+  .btn-danger:hover{filter:brightness(1.1);transform:translateY(-1px)}
+
+  /* ---------- TOAST ---------- */
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:28px;
+    transform:translate(-50%, 24px);
+    z-index:60;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:13px 20px;
+    border-radius:12px;
+    font-size:14px;
+    font-weight:600;
+    color:#eafff3;
+    background:linear-gradient(180deg, rgba(36,58,46,.98), rgba(22,38,30,.98));
+    border:1px solid rgba(79,209,139,.5);
+    box-shadow:0 16px 40px rgba(0,0,0,.55), 0 0 22px rgba(79,209,139,.16);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .28s var(--ease), transform .28s var(--ease);
+  }
+  .toast.show{opacity:1;transform:translate(-50%, 0)}
+  .toast.error{
+    color:#ffe9ec;
+    background:linear-gradient(180deg, rgba(62,28,36,.98), rgba(40,18,24,.98));
+    border-color:rgba(240,96,112,.5);
+    box-shadow:0 16px 40px rgba(0,0,0,.55), 0 0 22px rgba(240,96,112,.16);
+  }
+
+  /* ---------- STATS ---------- */
+  .stats-grid{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0,1fr));
+    gap:12px;
+  }
+  .stat{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    background:linear-gradient(160deg, rgba(38,38,66,.85), rgba(22,22,40,.9));
+    border:1px solid rgba(212,168,67,.14);
+    border-radius:13px;
+    padding:13px 14px;
+    transition:transform .25s var(--ease), border-color .25s var(--ease), box-shadow .25s var(--ease);
+  }
+  .stat:hover{
+    transform:translateY(-3px);
+    border-color:rgba(212,168,67,.45);
+    box-shadow:0 12px 26px rgba(0,0,0,.45);
+  }
+  .stat-ico{
+    font-size:20px;
+    line-height:1;
+    flex:0 0 auto;
+    filter:drop-shadow(0 3px 10px rgba(240,192,64,.3));
+  }
+  .stat-body{min-width:0}
+  .stat-label{
+    font-size:10.5px;
+    font-weight:600;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .stat-value{
+    font-family:'Cinzel', serif;
+    font-weight:600;
+    font-size:clamp(16px, 2.6vw, 20px);
+    color:var(--gold-bright);
+    line-height:1.15;
+    word-break:break-word;
+  }
+  .stat-value.pos{color:var(--green);text-shadow:0 0 16px rgba(79,209,139,.22)}
+  .stat-value.neg{color:var(--red);text-shadow:0 0 16px rgba(240,96,112,.2)}
+
+  /* ---------- HISTORY ---------- */
+  .table-wrap{
+    overflow-x:auto;
+    border:1px solid rgba(212,168,67,.14);
+    border-radius:13px;
+    background:rgba(12,12,24,.35);
+  }
+  .hist-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  .hist-table th{
+    text-align:left;
+    font-family:'Cinzel', serif;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--gold);
+    padding:13px 14px;
+    border-bottom:1px solid rgba(212,168,67,.24);
+    white-space:nowrap;
+    background:rgba(12,12,24,.5);
+  }
+  .hist-table td{
+    padding:12px 14px;
+    border-bottom:1px solid rgba(255,255,255,.045);
+    color:var(--text);
+    white-space:nowrap;
+  }
+  .hist-table tbody tr{transition:background .2s var(--ease)}
+  .hist-table tbody tr:nth-child(even){background:rgba(255,255,255,.028)}
+  .hist-table tbody tr:hover{background:rgba(212,168,67,.09)}
+  .hist-table tbody tr:last-child td{border-bottom:0}
+  .num{
+    font-variant-numeric:tabular-nums;
+    font-weight:600;
+    color:var(--text-strong);
+  }
+  .num.profit{color:var(--green)}
+  .num.loss{color:var(--red)}
+  .res-tag{
+    display:inline-block;
+    margin-left:6px;
+    font-size:10px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+    border:1px solid rgba(212,168,67,.2);
+    border-radius:999px;
+    padding:1px 7px;
+  }
+  .btn-del{
+    appearance:none;
+    width:32px;
+    height:32px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    line-height:1;
+    color:var(--red);
+    background:rgba(240,96,112,.1);
+    border:1px solid rgba(240,96,112,.3);
+    border-radius:9px;
+    cursor:pointer;
+    transition:all .2s var(--ease);
+  }
+  .btn-del:hover{
+    background:rgba(240,96,112,.24);
+    border-color:var(--red);
+    transform:scale(1.08);
+  }
+  .col-actions{text-align:right}
+
+  .hist-empty{
+    text-align:center;
+    color:var(--muted);
+    font-size:14px;
+    padding:34px 12px;
+    border:1px dashed rgba(212,168,67,.18);
+    border-radius:12px;
+    background:rgba(12,12,24,.35);
+  }
+  .hist-foot{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:14px;
+  }
+
+  .hist-panel{animation:tipIn .45s var(--ease) both}
+
+  /* ---------- MODAL ---------- */
+  .modal-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:80;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(6,6,14,.72);
+    backdrop-filter:blur(4px);
+    animation:fadeIn .2s var(--ease) both;
+  }
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .modal{
+    width:100%;
+    max-width:420px;
+    text-align:center;
+    background:linear-gradient(170deg, rgba(38,38,66,.99), rgba(20,20,36,.99));
+    border:1px solid rgba(212,168,67,.35);
+    border-radius:16px;
+    padding:24px 22px 20px;
+    box-shadow:0 24px 60px rgba(0,0,0,.6);
+    animation:cardIn .28s var(--ease) both;
+  }
+  .modal-ico{font-size:34px;line-height:1;margin-bottom:10px}
+  .modal-title{
+    font-family:'Cinzel', serif;
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--gold-bright);
+    margin-bottom:8px;
+  }
+  .modal-text{font-size:13.5px;color:var(--text);line-height:1.5;margin:0 0 20px}
+  .modal-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
   /* ---------- RESPONSIVE ---------- */
   @media (max-width:760px){
     body{padding:20px 12px 40px}
@@ -492,10 +753,52 @@
     .resource-switch{grid-template-columns:repeat(2, minmax(0,1fr))}
     .card-value{font-size:19px}
     .panel-head h2{font-size:14px}
+    .stats-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+    .btn-gold{width:100%;padding:14px 18px;font-size:13px}
+
+    .table-wrap{border:0;background:transparent;overflow:visible}
+    .hist-table, .hist-table tbody, .hist-table tr, .hist-table td{display:block;width:100%}
+    .hist-table thead{display:none}
+    .hist-table tr{
+      background:linear-gradient(160deg, rgba(38,38,66,.85), rgba(22,22,40,.9)) !important;
+      border:1px solid rgba(212,168,67,.16);
+      border-radius:13px;
+      padding:12px 14px;
+      margin-bottom:10px;
+    }
+    .hist-table tr:hover{border-color:rgba(212,168,67,.45)}
+    .hist-table td{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:6px 0;
+      border-bottom:1px dashed rgba(255,255,255,.06);
+      white-space:normal;
+      text-align:right;
+    }
+    .hist-table td:last-child{border-bottom:0}
+    .hist-table td::before{
+      content:attr(data-label);
+      flex:0 0 auto;
+      font-size:10.5px;
+      font-weight:600;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+      text-align:left;
+    }
+    .hist-table td[data-label=""]::before{display:none}
+    .hist-table td.col-actions{justify-content:flex-end;padding-top:10px}
+    .hist-table td.col-actions .btn-del{width:38px;height:38px}
+    .hist-panel .panel-head{justify-content:space-between}
+    .hist-foot{justify-content:stretch}
+    .hist-foot .btn-ghost{width:100%}
   }
   @media (max-width:380px){
     .results-grid{grid-template-columns:1fr}
     .card.wide{grid-column:span 1}
+    .stats-grid{grid-template-columns:1fr}
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -634,9 +937,99 @@
         <div class="tip-text" id="tipText"></div>
       </div>
     </div>
+
+    <div class="actions" id="saveRow" hidden>
+      <button class="btn-gold" id="saveBtn" type="button">💾 Сохранить продажу</button>
+    </div>
+  </section>
+
+  <section class="panel stats-panel">
+    <div class="panel-head">
+      <h2>Общая статистика</h2>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-ico">📦</div>
+        <div class="stat-body">
+          <div class="stat-label">Всего продаж</div>
+          <div class="stat-value" id="statCount">0</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-ico">🧵</div>
+        <div class="stat-body">
+          <div class="stat-label">Всего ткани произведено</div>
+          <div class="stat-value" id="statCloth">0</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-ico">💰</div>
+        <div class="stat-body">
+          <div class="stat-label">Общая прибыль</div>
+          <div class="stat-value" id="statProfit">0</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-ico">📊</div>
+        <div class="stat-body">
+          <div class="stat-label">Средняя прибыль за продажу</div>
+          <div class="stat-value" id="statAvg">0</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-ico">🌿</div>
+        <div class="stat-body">
+          <div class="stat-label">Всего сырья израсходовано</div>
+          <div class="stat-value" id="statRaw">0</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel hist-panel">
+    <div class="panel-head">
+      <h2>История продаж</h2>
+      <span class="chip" id="histCount">0 записей</span>
+    </div>
+
+    <div class="hist-empty" id="historyEmpty">Пока нет сохранённых продаж</div>
+
+    <div class="table-wrap" id="historyWrap" hidden>
+      <table class="hist-table">
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Кол-во хлопка</th>
+            <th>Произведено ткани</th>
+            <th>Прибыль</th>
+            <th class="col-actions">Удалить</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+
+    <div class="hist-foot" id="clearRow" hidden>
+      <button class="btn-ghost" id="clearAllBtn" type="button">🗑️ Очистить всю историю</button>
+    </div>
   </section>
 
   <p class="foot">Расчёт носит оценочный характер · данные рынка вводите вручную</p>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="modal-backdrop" id="confirmModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-ico">⚠️</div>
+    <div class="modal-title" id="modalTitle">Очистить историю?</div>
+    <p class="modal-text">Вы уверены? Все данные будут удалены.</p>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="modalCancel" type="button">Отмена</button>
+      <button class="btn-danger" id="modalConfirm" type="button">Удалить всё</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -646,15 +1039,16 @@
   var $ = function (id) { return document.getElementById(id); };
 
   var RESOURCES = {
-    cotton: { out: "Ткань", buyLabel: "Цена хлопка", sellLabel: "Цена ткани при продаже", amountLabel: "Количество хлопка", unit: "Тканей", perUnit: 2 },
-    flax:   { out: "Льняное полотно", buyLabel: "Цена льна", sellLabel: "Цена полотна при продаже", amountLabel: "Количество льна", unit: "Полотна", perUnit: 3 },
-    hide:   { out: "Выделанная кожа", buyLabel: "Цена сырой кожи", sellLabel: "Цена кожи при продаже", amountLabel: "Количество кожи", unit: "Кожи", perUnit: 4 },
-    ore:    { out: "Металлический слиток", buyLabel: "Цена руды", sellLabel: "Цена слитка при продаже", amountLabel: "Количество руды", unit: "Слитков", perUnit: 5 }
+    cotton: { out: "Ткань", short: "Хлопок", buyLabel: "Цена хлопка", sellLabel: "Цена ткани при продаже", amountLabel: "Количество хлопка", perUnit: 2 },
+    flax:   { out: "Льняное полотно", short: "Лён", buyLabel: "Цена льна", sellLabel: "Цена полотна при продаже", amountLabel: "Количество льна", perUnit: 3 },
+    hide:   { out: "Выделанная кожа", short: "Кожа", buyLabel: "Цена сырой кожи", sellLabel: "Цена кожи при продаже", amountLabel: "Количество кожи", perUnit: 4 },
+    ore:    { out: "Металлический слиток", short: "Руда", buyLabel: "Цена руды", sellLabel: "Цена слитка при продаже", amountLabel: "Количество руды", perUnit: 5 }
   };
 
   var REFUND = { base: 36.5, focus: 53.9 };
 
   var state = { res: "cotton", focus: false };
+  var lastCalc = null;
 
   var fmtInt = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
   var fmtDec = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -707,17 +1101,19 @@
   }
 
   function showEmpty() {
+    lastCalc = null;
     $("emptyState").hidden = false;
     $("resultsGrid").hidden = true;
     $("resultsGrid").classList.remove("in");
     $("tipBlock").hidden = true;
+    $("saveRow").hidden = true;
     $("chips").innerHTML = "";
   }
 
   function renderChips(tax, refund) {
     var r = RESOURCES[state.res];
     var out = [
-      '<span class="chip gold">' + r.buyLabel.replace("Цена ", "") + " → " + r.out + "</span>",
+      '<span class="chip gold">' + r.short + " → " + r.out + "</span>",
       '<span class="chip">Налог ' + tax + "%</span>",
       '<span class="chip">Возврат ' + refund + "%</span>",
       '<span class="chip">' + (state.focus ? "🧠 Фокусировка" : "Без фокусировки") + "</span>",
@@ -775,10 +1171,25 @@
     var margin = totalCost > 0 ? (profit / totalCost) * 100 : 0;
     var optimal = Math.max(1, Math.ceil(produced * effectivePerUnit));
 
+    lastCalc = {
+      resource: state.res,
+      resourceName: r.out,
+      buy: buy,
+      sell: sell,
+      amount: amount,
+      tax: tax,
+      focus: state.focus,
+      produced: produced,
+      profit: profit,
+      margin: margin
+    };
+
     var wasHidden = $("resultsGrid").hidden;
     $("emptyState").hidden = true;
     $("resultsGrid").hidden = false;
     $("tipBlock").hidden = false;
+    $("saveRow").hidden = false;
+    $("saveBtn").disabled = false;
 
     if (wasHidden) {
       $("resultsGrid").classList.remove("in");
@@ -839,6 +1250,212 @@
     }
   }
 
+  /* ---------- SALES HISTORY (localStorage) ---------- */
+  var STORE_KEY = "albion.cloth.sales.v1";
+  var sales = [];
+  var toastTimer = null;
+
+  function showToast(text, isError) {
+    var el = $("toast");
+    setText(el, text);
+    el.classList.toggle("error", !!isError);
+    el.classList.add("show");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove("show"); }, 2000);
+  }
+
+  function loadSales() {
+    try {
+      var raw = window.localStorage.getItem(STORE_KEY);
+      if (!raw) return [];
+      var data = JSON.parse(raw);
+      if (!Array.isArray(data)) return [];
+      return data.filter(function (item) {
+        return item && typeof item === "object" && isFinite(Number(item.profit));
+      });
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function persist() {
+    try {
+      window.localStorage.setItem(STORE_KEY, JSON.stringify(sales));
+      return true;
+    } catch (e) {
+      showToast("⚠️ Не удалось сохранить данные в браузере", true);
+      return false;
+    }
+  }
+
+  function plural(n, forms) {
+    var abs = Math.abs(n) % 100;
+    var last = abs % 10;
+    if (abs > 10 && abs < 20) return forms[2];
+    if (last > 1 && last < 5) return forms[1];
+    if (last === 1) return forms[0];
+    return forms[2];
+  }
+
+  function formatDate(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "—";
+    var pad = function (n) { return n < 10 ? "0" + n : String(n); };
+    return pad(d.getDate()) + "." + pad(d.getMonth() + 1) + "." + d.getFullYear() +
+      " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+  }
+
+  function formatProfit(value) {
+    var n = Number(value) || 0;
+    return (n > 0 ? "+" : "") + fmtInt.format(n);
+  }
+
+  function makeCell(label) {
+    var td = document.createElement("td");
+    td.setAttribute("data-label", label);
+    return td;
+  }
+
+  function renderHistory() {
+    var body = $("historyBody");
+    body.innerHTML = "";
+
+    var hasSales = sales.length > 0;
+    $("historyEmpty").hidden = hasSales;
+    $("historyWrap").hidden = !hasSales;
+    $("clearRow").hidden = !hasSales;
+    setText($("histCount"), sales.length + " " + plural(sales.length, ["запись", "записи", "записей"]));
+
+    sales.forEach(function (sale) {
+      var res = RESOURCES[sale.resource] || RESOURCES.cotton;
+      var tr = document.createElement("tr");
+
+      var dateCell = makeCell("Дата");
+      dateCell.textContent = formatDate(sale.date);
+      tr.appendChild(dateCell);
+
+      var amountCell = makeCell("Кол-во хлопка");
+      var amountVal = document.createElement("span");
+      amountVal.className = "num";
+      amountVal.textContent = fmtInt.format(Number(sale.amount) || 0);
+      amountCell.appendChild(amountVal);
+      if (sale.resource && sale.resource !== "cotton") {
+        var tag = document.createElement("span");
+        tag.className = "res-tag";
+        tag.textContent = res.short;
+        amountCell.appendChild(tag);
+      }
+      tr.appendChild(amountCell);
+
+      var clothCell = makeCell("Произведено ткани");
+      var clothVal = document.createElement("span");
+      clothVal.className = "num";
+      clothVal.textContent = fmtInt.format(Number(sale.produced) || 0);
+      clothCell.appendChild(clothVal);
+      tr.appendChild(clothCell);
+
+      var profitValue = Number(sale.profit) || 0;
+      var profitCell = makeCell("Прибыль");
+      var profitVal = document.createElement("span");
+      profitVal.className = "num " + (profitValue >= 0 ? "profit" : "loss");
+      profitVal.textContent = formatProfit(profitValue) + " с";
+      profitCell.appendChild(profitVal);
+      tr.appendChild(profitCell);
+
+      var actionsCell = makeCell("");
+      actionsCell.className = "col-actions";
+      var del = document.createElement("button");
+      del.type = "button";
+      del.className = "btn-del";
+      del.title = "Удалить запись";
+      del.setAttribute("aria-label", "Удалить запись от " + formatDate(sale.date));
+      del.textContent = "🗑️";
+      del.addEventListener("click", function () { deleteSale(sale.id); });
+      actionsCell.appendChild(del);
+      tr.appendChild(actionsCell);
+
+      body.appendChild(tr);
+    });
+  }
+
+  function renderStats() {
+    var count = sales.length;
+    var cloth = 0;
+    var profit = 0;
+    var raw = 0;
+
+    sales.forEach(function (s) {
+      cloth += Number(s.produced) || 0;
+      profit += Number(s.profit) || 0;
+      raw += Number(s.amount) || 0;
+    });
+
+    var avg = count > 0 ? profit / count : 0;
+
+    animateNumber($("statCount"), count, function (v) { return fmtInt.format(v); });
+    animateNumber($("statCloth"), cloth, function (v) { return fmtInt.format(v); });
+    animateNumber($("statProfit"), profit, function (v) { return fmtInt.format(v) + " серебра"; });
+    animateNumber($("statAvg"), avg, function (v) { return fmtInt.format(v) + " серебра"; });
+    animateNumber($("statRaw"), raw, function (v) { return fmtInt.format(v); });
+
+    $("statProfit").classList.toggle("pos", profit >= 0);
+    $("statProfit").classList.toggle("neg", profit < 0);
+    $("statAvg").classList.toggle("pos", avg >= 0);
+    $("statAvg").classList.toggle("neg", avg < 0);
+  }
+
+  function makeId() {
+    return "s" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function saveSale() {
+    if (!lastCalc) return;
+
+    sales.unshift({
+      id: makeId(),
+      date: new Date().toISOString(),
+      resource: lastCalc.resource,
+      buyPrice: lastCalc.buy,
+      sellPrice: lastCalc.sell,
+      amount: lastCalc.amount,
+      tax: lastCalc.tax,
+      focus: lastCalc.focus,
+      produced: lastCalc.produced,
+      profit: lastCalc.profit
+    });
+
+    if (!persist()) return;
+    renderHistory();
+    renderStats();
+    showToast("✅ Продажа сохранена");
+  }
+
+  function deleteSale(id) {
+    sales = sales.filter(function (item) { return item.id !== id; });
+    persist();
+    renderHistory();
+    renderStats();
+    showToast("🗑️ Запись удалена");
+  }
+
+  function openConfirm() {
+    $("confirmModal").hidden = false;
+    $("modalConfirm").focus();
+  }
+
+  function closeConfirm() {
+    $("confirmModal").hidden = true;
+  }
+
+  function clearAll() {
+    sales = [];
+    try { window.localStorage.removeItem(STORE_KEY); } catch (e) { /* хранилище недоступно */ }
+    renderHistory();
+    renderStats();
+    closeConfirm();
+    showToast("🧹 История очищена");
+  }
+
   function resetAll() {
     state.res = "cotton";
     state.focus = false;
@@ -882,7 +1499,22 @@
 
   $("resetBtn").addEventListener("click", resetAll);
 
+  $("saveBtn").addEventListener("click", saveSale);
+
+  $("clearAllBtn").addEventListener("click", openConfirm);
+  $("modalCancel").addEventListener("click", closeConfirm);
+  $("modalConfirm").addEventListener("click", clearAll);
+  $("confirmModal").addEventListener("click", function (event) {
+    if (event.target === this) closeConfirm();
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && !$("confirmModal").hidden) closeConfirm();
+  });
+
   applyResourceLabels();
+  sales = loadSales();
+  renderHistory();
+  renderStats();
   calculate(false);
 })();
 </script>

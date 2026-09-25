@@ -743,6 +743,31 @@
   .modal-text{font-size:13.5px;color:var(--text);line-height:1.5;margin:0 0 20px}
   .modal-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 
+  /* ---------- TIER SWITCH / FOCUS POINTS / BREAKDOWN / WARN ---------- */
+  .resource-switch.cols-5{grid-template-columns:repeat(5, minmax(0,1fr))}
+  .switch-group{display:flex;flex-direction:column;gap:14px}
+  .switch-group .switch + .switch{margin-top:0}
+  .focus-points{margin-top:16px}
+  .focus-warn{
+    margin-top:14px;
+    padding:12px 14px;
+    border-radius:12px;
+    background:rgba(240,96,112,.12);
+    border:1px solid rgba(240,96,112,.35);
+    color:var(--text);
+    font-size:13px;
+    line-height:1.5;
+  }
+  .focus-warn strong{color:var(--red)}
+  .breakdown{margin-top:18px;padding-top:16px;border-top:1px dashed rgba(212,168,67,.16)}
+  .breakdown-title{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  .breakdown-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.06);font-size:13px}
+  .breakdown-row:last-child{border-bottom:0}
+  .breakdown-row .name{color:var(--text-strong);font-weight:600}
+  .breakdown-row .num{font-variant-numeric:tabular-nums;color:var(--muted)}
+  .breakdown-row .num.profit{color:var(--green)}
+  .breakdown-row .num.loss{color:var(--red)}
+
   /* ---------- RESPONSIVE ---------- */
   @media (max-width:760px){
     body{padding:20px 12px 40px}
@@ -829,6 +854,15 @@
       <button class="res" type="button" data-res="ore">⛏️ Металл</button>
     </div>
 
+    <span class="field-label" style="margin:0 0 8px"><span class="ico">⭐</span>Тир предмета <span style="opacity:.6">— определяет соотношение сырьё : изделие</span></span>
+    <div class="resource-switch cols-5" id="tierSwitch" role="tablist" aria-label="Тир предмета">
+      <button class="res" type="button" data-tier="4">T4 · 2:1</button>
+      <button class="res" type="button" data-tier="5">T5 · 3:1</button>
+      <button class="res active" type="button" data-tier="6">T6 · 4:1</button>
+      <button class="res" type="button" data-tier="7">T7 · 5:1</button>
+      <button class="res" type="button" data-tier="8">T8 · 6:1</button>
+    </div>
+
     <div class="grid-form">
       <label class="field">
         <span class="field-label"><span class="ico">💰</span><span id="buyLabel">Цена хлопка</span></span>
@@ -856,25 +890,50 @@
 
       <label class="field">
         <span class="field-label"><span class="ico">📊</span>Налог на продажу</span>
-        <span class="input-wrap select-wrap">
-          <select id="taxRate">
-            <option value="4.5">4.5% — с фокусировкой</option>
-            <option value="6.5">6.5% — премиум</option>
-            <option value="10.5" selected>10.5% — обычный</option>
-          </select>
+        <span class="input-wrap">
+          <input type="number" id="taxRate" value="8" min="0" max="100" step="0.1" inputmode="decimal" placeholder="0">
+          <span class="unit">%</span>
         </span>
       </label>
     </div>
 
     <div class="focus-row">
-      <label class="switch">
-        <input type="checkbox" id="useFocus">
-        <span class="track"><span class="thumb"></span></span>
-        <span class="switch-text">
-          Использовать фокусировку
-          <em id="focusHint">возврат 53.9% вместо 36.5%</em>
-        </span>
-      </label>
+      <div class="switch-group">
+        <label class="switch">
+          <input type="checkbox" id="usePremium">
+          <span class="track"><span class="thumb"></span></span>
+          <span class="switch-text">
+            Премиум-аккаунт
+            <em id="premiumHint">налог 4% вместо 8%</em>
+          </span>
+        </label>
+
+        <label class="switch">
+          <input type="checkbox" id="useFocus">
+          <span class="track"><span class="thumb"></span></span>
+          <span class="switch-text">
+            Использовать фокусировку
+            <em id="focusHint">возврат 53.9% вместо 36.5%</em>
+          </span>
+        </label>
+      </div>
+
+      <div class="grid-form focus-points" id="focusPointsRow" hidden>
+        <label class="field">
+          <span class="field-label"><span class="ico">🔷</span>Фокус на ед. сырья</span>
+          <span class="input-wrap">
+            <input type="number" id="focusCost" min="0" step="1" inputmode="numeric" placeholder="0">
+            <span class="unit">фок.</span>
+          </span>
+        </label>
+        <label class="field">
+          <span class="field-label"><span class="ico">🔋</span>Доступно фокуса</span>
+          <span class="input-wrap">
+            <input type="number" id="focusAvailable" min="0" step="1" inputmode="numeric" placeholder="0">
+            <span class="unit">фок.</span>
+          </span>
+        </label>
+      </div>
     </div>
   </section>
 
@@ -929,6 +988,8 @@
         <div class="card-sub" id="sLeft">эквивалент сырья</div>
       </div>
     </div>
+
+    <div class="focus-warn" id="focusWarn" hidden></div>
 
     <div class="tip" id="tipBlock" hidden>
       <div class="tip-ico">💡</div>
@@ -985,6 +1046,11 @@
         </div>
       </div>
     </div>
+
+    <div class="breakdown" id="breakdown" hidden>
+      <div class="breakdown-title">Разбивка по материалам и тирам</div>
+      <div class="breakdown-list" id="breakdownList"></div>
+    </div>
   </section>
 
   <section class="panel hist-panel">
@@ -1039,15 +1105,20 @@
   var $ = function (id) { return document.getElementById(id); };
 
   var RESOURCES = {
-    cotton: { out: "Ткань", short: "Хлопок", buyLabel: "Цена хлопка", sellLabel: "Цена ткани при продаже", amountLabel: "Количество хлопка", perUnit: 2 },
-    flax:   { out: "Льняное полотно", short: "Лён", buyLabel: "Цена льна", sellLabel: "Цена полотна при продаже", amountLabel: "Количество льна", perUnit: 3 },
-    hide:   { out: "Выделанная кожа", short: "Кожа", buyLabel: "Цена сырой кожи", sellLabel: "Цена кожи при продаже", amountLabel: "Количество кожи", perUnit: 4 },
-    ore:    { out: "Металлический слиток", short: "Руда", buyLabel: "Цена руды", sellLabel: "Цена слитка при продаже", amountLabel: "Количество руды", perUnit: 5 }
+    cotton: { out: "Ткань", short: "Хлопок", buyLabel: "Цена хлопка", sellLabel: "Цена ткани при продаже", amountLabel: "Количество хлопка" },
+    flax:   { out: "Льняное полотно", short: "Лён", buyLabel: "Цена льна", sellLabel: "Цена полотна при продаже", amountLabel: "Количество льна" },
+    hide:   { out: "Выделанная кожа", short: "Кожа", buyLabel: "Цена сырой кожи", sellLabel: "Цена кожи при продаже", amountLabel: "Количество кожи" },
+    ore:    { out: "Металлический слиток", short: "Руда", buyLabel: "Цена руды", sellLabel: "Цена слитка при продаже", amountLabel: "Количество руды" }
   };
 
+  // Соотношение сырьё → изделие определяется тиром предмета, а не типом ресурса —
+  // на любом материале при одном тире соотношение одинаковое.
+  var TIER_RATIO = { 4: 2, 5: 3, 6: 4, 7: 5, 8: 6 };
+
+  var TAX = { normal: 8, premium: 4 };
   var REFUND = { base: 36.5, focus: 53.9 };
 
-  var state = { res: "cotton", focus: false };
+  var state = { res: "cotton", tier: 6, focus: false, premium: false };
   var lastCalc = null;
 
   var fmtInt = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
@@ -1106,6 +1177,7 @@
     $("resultsGrid").hidden = true;
     $("resultsGrid").classList.remove("in");
     $("tipBlock").hidden = true;
+    $("focusWarn").hidden = true;
     $("saveRow").hidden = true;
     $("chips").innerHTML = "";
   }
@@ -1113,11 +1185,12 @@
   function renderChips(tax, refund) {
     var r = RESOURCES[state.res];
     var out = [
-      '<span class="chip gold">' + r.short + " → " + r.out + "</span>",
+      '<span class="chip gold">' + r.short + " → " + r.out + " · T" + state.tier + "</span>",
       '<span class="chip">Налог ' + tax + "%</span>",
       '<span class="chip">Возврат ' + refund + "%</span>",
+      '<span class="chip">' + (state.premium ? "⭐ Премиум" : "Без премиума") + "</span>",
       '<span class="chip">' + (state.focus ? "🧠 Фокусировка" : "Без фокусировки") + "</span>",
-      '<span class="chip">Рецепт ' + r.perUnit + " : 1</span>"
+      '<span class="chip">Рецепт ' + TIER_RATIO[state.tier] + " : 1</span>"
     ];
     $("chips").innerHTML = out.join("");
   }
@@ -1158,7 +1231,7 @@
       return;
     }
 
-    var effectivePerUnit = r.perUnit * (1 - refund / 100);
+    var effectivePerUnit = TIER_RATIO[state.tier] * (1 - refund / 100);
     var produced = Math.floor(amount / effectivePerUnit);
     var usedEff = produced * effectivePerUnit;
     var leftEff = amount - usedEff;
@@ -1171,14 +1244,30 @@
     var margin = totalCost > 0 ? (profit / totalCost) * 100 : 0;
     var optimal = Math.max(1, Math.ceil(produced * effectivePerUnit));
 
+    var focusCostPerUnit = state.focus ? num($("focusCost").value) : 0;
+    var focusAvailable = num($("focusAvailable").value);
+    var focusNeeded = focusCostPerUnit * amount;
+
+    if (state.focus && focusCostPerUnit > 0 && focusAvailable > 0 && focusNeeded > focusAvailable) {
+      var maxAmount = Math.floor(focusAvailable / focusCostPerUnit);
+      $("focusWarn").hidden = false;
+      $("focusWarn").innerHTML = "⚠️ На партию из <strong>" + fmtInt.format(amount) + "</strong> ед. сырья нужно <strong>" +
+        fmtInt.format(focusNeeded) + "</strong> фокуса, а доступно только <strong>" + fmtInt.format(focusAvailable) +
+        "</strong>. Этого хватит максимум на <strong>" + fmtInt.format(maxAmount) + "</strong> ед. сырья.";
+    } else {
+      $("focusWarn").hidden = true;
+    }
+
     lastCalc = {
       resource: state.res,
       resourceName: r.out,
+      tier: state.tier,
       buy: buy,
       sell: sell,
       amount: amount,
       tax: tax,
       focus: state.focus,
+      premium: state.premium,
       produced: produced,
       profit: profit,
       margin: margin
@@ -1339,12 +1428,10 @@
       amountVal.className = "num";
       amountVal.textContent = fmtInt.format(Number(sale.amount) || 0);
       amountCell.appendChild(amountVal);
-      if (sale.resource && sale.resource !== "cotton") {
-        var tag = document.createElement("span");
-        tag.className = "res-tag";
-        tag.textContent = res.short;
-        amountCell.appendChild(tag);
-      }
+      var tag = document.createElement("span");
+      tag.className = "res-tag";
+      tag.textContent = res.short + " · T" + (sale.tier || 6);
+      amountCell.appendChild(tag);
       tr.appendChild(amountCell);
 
       var clothCell = makeCell("Произведено ткани");
@@ -1402,6 +1489,53 @@
     $("statProfit").classList.toggle("neg", profit < 0);
     $("statAvg").classList.toggle("pos", avg >= 0);
     $("statAvg").classList.toggle("neg", avg < 0);
+
+    renderBreakdown();
+  }
+
+  function renderBreakdown() {
+    var wrap = $("breakdown");
+    var list = $("breakdownList");
+    list.innerHTML = "";
+
+    if (sales.length === 0) {
+      wrap.hidden = true;
+      return;
+    }
+
+    var groups = {};
+    sales.forEach(function (s) {
+      var tier = s.tier || 6;
+      var key = s.resource + "_" + tier;
+      if (!groups[key]) {
+        groups[key] = { resource: s.resource, tier: tier, count: 0, produced: 0, profit: 0 };
+      }
+      groups[key].count += 1;
+      groups[key].produced += Number(s.produced) || 0;
+      groups[key].profit += Number(s.profit) || 0;
+    });
+
+    Object.keys(groups).sort().forEach(function (key) {
+      var g = groups[key];
+      var res = RESOURCES[g.resource] || RESOURCES.cotton;
+      var row = document.createElement("div");
+      row.className = "breakdown-row";
+
+      var label = document.createElement("span");
+      label.className = "name";
+      label.textContent = res.short + " · T" + g.tier;
+
+      var vals = document.createElement("span");
+      vals.className = "num " + (g.profit >= 0 ? "profit" : "loss");
+      vals.textContent = g.count + " " + plural(g.count, ["продажа", "продажи", "продаж"]) + " · " +
+        fmtInt.format(g.produced) + " ед. · " + formatProfit(g.profit) + " с";
+
+      row.appendChild(label);
+      row.appendChild(vals);
+      list.appendChild(row);
+    });
+
+    wrap.hidden = false;
   }
 
   function makeId() {
@@ -1415,11 +1549,13 @@
       id: makeId(),
       date: new Date().toISOString(),
       resource: lastCalc.resource,
+      tier: lastCalc.tier,
       buyPrice: lastCalc.buy,
       sellPrice: lastCalc.sell,
       amount: lastCalc.amount,
       tax: lastCalc.tax,
       focus: lastCalc.focus,
+      premium: lastCalc.premium,
       produced: lastCalc.produced,
       profit: lastCalc.profit
     });
@@ -1458,16 +1594,26 @@
 
   function resetAll() {
     state.res = "cotton";
+    state.tier = 6;
     state.focus = false;
+    state.premium = false;
     $("useFocus").checked = false;
+    $("usePremium").checked = false;
+    $("focusPointsRow").hidden = true;
+    $("focusCost").value = "";
+    $("focusAvailable").value = "";
     $("buyPrice").value = "";
     $("sellPrice").value = "";
     $("amount").value = "";
-    $("taxRate").value = "10.5";
+    $("taxRate").value = TAX.normal;
 
-    var buttons = document.querySelectorAll(".res");
+    var buttons = document.querySelectorAll("#resourceSwitch .res");
     for (var i = 0; i < buttons.length; i++) {
       buttons[i].classList.toggle("active", buttons[i].dataset.res === "cotton");
+    }
+    var tierButtons = document.querySelectorAll("#tierSwitch .res");
+    for (var j = 0; j < tierButtons.length; j++) {
+      tierButtons[j].classList.toggle("active", tierButtons[j].dataset.tier === "6");
     }
 
     applyResourceLabels();
@@ -1486,13 +1632,30 @@
     calculate(true);
   });
 
-  $("useFocus").addEventListener("change", function () {
-    state.focus = this.checked;
-    $("taxRate").value = this.checked ? "4.5" : "10.5";
+  document.getElementById("tierSwitch").addEventListener("click", function (event) {
+    var btn = event.target.closest(".res");
+    if (!btn || btn.classList.contains("active")) return;
+    var buttons = this.querySelectorAll(".res");
+    for (var i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
+    btn.classList.add("active");
+    state.tier = parseInt(btn.dataset.tier, 10);
+    applyResourceLabels();
     calculate(true);
   });
 
-  ["buyPrice", "sellPrice", "amount", "taxRate"].forEach(function (id) {
+  $("usePremium").addEventListener("change", function () {
+    state.premium = this.checked;
+    $("taxRate").value = this.checked ? TAX.premium : TAX.normal;
+    calculate(true);
+  });
+
+  $("useFocus").addEventListener("change", function () {
+    state.focus = this.checked;
+    $("focusPointsRow").hidden = !this.checked;
+    calculate(true);
+  });
+
+  ["buyPrice", "sellPrice", "amount", "taxRate", "focusCost", "focusAvailable"].forEach(function (id) {
     $(id).addEventListener("input", function () { calculate(true); });
     $(id).addEventListener("change", function () { calculate(true); });
   });

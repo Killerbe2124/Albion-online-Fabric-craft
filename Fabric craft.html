@@ -4,7 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#0f0f1a" />
-<title>🧶 Крафт ткани — Калькулятор Albion Online</title>
+<meta name="color-scheme" content="dark" />
+<meta name="description" content="Калькулятор рентабельности переработки сырья и крафта плащей для Albion Online: налоги, возврат ресурсов, фокус, история и статистика." />
+<title>⚔️ Albion Калькулятор</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,6 +70,37 @@
     z-index:1;
     max-width:960px;
     margin:0 auto;
+    animation:pageIn .7s var(--ease) both;
+  }
+  @keyframes pageIn{
+    from{opacity:0; transform:translateY(16px)}
+    to{opacity:1; transform:translateY(0)}
+  }
+
+  /* ---------- EMBER PARTICLES ---------- */
+  .embers{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:0;
+  }
+  .ember{
+    position:absolute;
+    bottom:-10px;
+    border-radius:50%;
+    background:radial-gradient(circle, #fff6dc, var(--gold-bright) 55%, transparent 75%);
+    box-shadow:0 0 7px 1px rgba(240,192,64,.55);
+    opacity:0;
+    animation-name:emberRise;
+    animation-timing-function:linear;
+    animation-iteration-count:infinite;
+  }
+  @keyframes emberRise{
+    0%{transform:translate(0,0); opacity:0}
+    8%{opacity:.85}
+    85%{opacity:.35}
+    100%{transform:translate(var(--drift,0px), -108vh); opacity:0}
   }
 
   /* ---------- HERO ---------- */
@@ -76,12 +109,24 @@
     margin-bottom:26px;
   }
   .crest{
+    position:relative;
     font-size:44px;
     line-height:1;
     display:inline-block;
     filter:drop-shadow(0 6px 16px rgba(240,192,64,.35));
     animation:float 5s var(--ease) infinite;
   }
+  .crest::before{
+    content:"";
+    position:absolute;
+    inset:-20px;
+    background:conic-gradient(from 0deg, transparent, rgba(240,192,64,.4), transparent 32%, transparent 68%, rgba(88,120,255,.25), transparent);
+    filter:blur(7px);
+    border-radius:50%;
+    animation:crestSpin 7s linear infinite;
+    z-index:-1;
+  }
+  @keyframes crestSpin{to{transform:rotate(360deg)}}
   @keyframes float{
     0%,100%{transform:translateY(0)}
     50%{transform:translateY(-6px)}
@@ -93,11 +138,18 @@
     letter-spacing:.06em;
     margin:10px 0 6px;
     text-transform:uppercase;
-    background:linear-gradient(180deg, #fbe9ae 0%, var(--gold-bright) 45%, #b8862c 100%);
+    background:linear-gradient(110deg, #b8862c 0%, #fbe9ae 20%, var(--gold-bright) 32%, #fbe9ae 44%, #b8862c 65%, #b8862c 100%);
+    background-size:220% 100%;
     -webkit-background-clip:text;
     background-clip:text;
     color:transparent;
     text-shadow:0 2px 18px rgba(212,168,67,.22);
+    animation:titleShimmer 5s ease-in-out infinite;
+  }
+  @keyframes titleShimmer{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
   }
   .hero .sub{
     margin:0;
@@ -113,7 +165,127 @@
   }
 
   /* ---------- PANELS ---------- */
+  .input-wrap input:disabled{opacity:.4;cursor:not-allowed}
+
+  .overall-summary{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0,1fr));
+    gap:10px;
+    margin-bottom:18px;
+    padding:14px 16px;
+    background:var(--panel-2);
+    border:1px solid var(--gold-dim);
+    border-radius:14px;
+    backdrop-filter:blur(8px);
+  }
+  .overall-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    text-align:center;
+  }
+  .overall-item.total{border-left:1px dashed rgba(212,168,67,.25)}
+  .overall-label{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .overall-value{
+    font-family:'Cinzel', serif;
+    font-size:17px;
+    font-weight:700;
+    color:var(--text-strong);
+  }
+  .overall-value.pos{color:var(--green)}
+  .overall-value.neg{color:var(--red)}
+  @media (max-width:620px){
+    .overall-summary{grid-template-columns:1fr}
+    .overall-item.total{border-left:0;border-top:1px dashed rgba(212,168,67,.25);padding-top:8px}
+  }
+
+  .tabs{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0,1fr));
+    gap:8px;
+    margin-bottom:18px;
+  }
+  .tab-btn{
+    appearance:none;
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--muted);
+    background:var(--panel);
+    border:1px solid rgba(255,255,255,.08);
+    padding:13px 10px;
+    border-radius:12px;
+    cursor:pointer;
+    transition:all .2s var(--ease);
+  }
+  .tab-btn:hover{color:var(--text)}
+  .tab-btn.active{
+    color:#1a1608;
+    background:linear-gradient(135deg,#a98424, var(--gold));
+    border-color:var(--gold);
+    animation:tabGlow 2.6s ease-in-out infinite;
+  }
+  @keyframes tabGlow{
+    0%,100%{box-shadow:0 4px 18px rgba(212,168,67,.25)}
+    50%{box-shadow:0 4px 28px rgba(212,168,67,.5)}
+  }
+
+  .tab-panel{animation:tabFade .35s var(--ease) both}
+  @keyframes tabFade{
+    from{opacity:0; transform:translateY(8px)}
+    to{opacity:1; transform:translateY(0)}
+  }
+
+  .top-btn{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    border:1px solid var(--gold);
+    background:linear-gradient(135deg,#a98424, var(--gold));
+    color:#1a1608;
+    font-size:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(0,0,0,.45), 0 0 16px rgba(212,168,67,.3);
+    opacity:0;
+    transform:translateY(12px) scale(.9);
+    pointer-events:none;
+    transition:opacity .25s var(--ease), transform .25s var(--ease);
+    z-index:5;
+  }
+  .top-btn.show{opacity:1; transform:translateY(0) scale(1); pointer-events:auto}
+  .top-btn:hover{filter:brightness(1.08)}
+  .top-btn:active{transform:scale(.93)}
+
+  .cascade-body,
+  .table-wrap{
+    scrollbar-width:thin;
+    scrollbar-color:var(--gold) rgba(255,255,255,.05);
+  }
+  .cascade-body::-webkit-scrollbar,
+  .table-wrap::-webkit-scrollbar{width:8px;height:8px}
+  .cascade-body::-webkit-scrollbar-track,
+  .table-wrap::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:8px}
+  .cascade-body::-webkit-scrollbar-thumb,
+  .table-wrap::-webkit-scrollbar-thumb{
+    background:linear-gradient(180deg,#a98424, var(--gold));
+    border-radius:8px;
+  }
+
   .panel{
+    position:relative;
     background:var(--panel);
     border:1px solid var(--gold-dim);
     border-radius:var(--radius);
@@ -121,8 +293,24 @@
     padding:20px 20px 22px;
     backdrop-filter:blur(8px);
     margin-bottom:20px;
-    transition:border-color .25s var(--ease), box-shadow .25s var(--ease);
+    transition:border-color .25s var(--ease), box-shadow .25s var(--ease), transform .25s var(--ease);
   }
+  .panel:hover{border-color:rgba(212,168,67,.32)}
+  .panel::before,
+  .panel::after{
+    content:"";
+    position:absolute;
+    width:16px;
+    height:16px;
+    border:2px solid var(--gold);
+    opacity:.3;
+    pointer-events:none;
+    transition:opacity .3s var(--ease);
+  }
+  .panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0;border-top-left-radius:7px}
+  .panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0;border-bottom-right-radius:7px}
+  .panel:hover::before,
+  .panel:hover::after{opacity:.65}
   .panel-head{
     display:flex;
     align-items:center;
@@ -293,7 +481,7 @@
     transition:all .25s var(--ease);
   }
   .switch input:checked + .track{
-    background:linear-gradient(135deg,#8a6d1f, var(--gold));
+    background:linear-gradient(135deg,#a98424, var(--gold));
     border-color:var(--gold);
     box-shadow:0 0 16px rgba(212,168,67,.3);
   }
@@ -307,7 +495,7 @@
     color:var(--text);
     line-height:1.4;
   }
-  .switch-text em{
+  .switch-text small{
     display:block;
     font-style:normal;
     font-size:12px;
@@ -476,7 +664,7 @@
 
   .foot{
     text-align:center;
-    color:#5d6277;
+    color:var(--muted);
     font-size:11.5px;
     letter-spacing:.05em;
     margin-top:6px;
@@ -487,6 +675,8 @@
     margin-top:16px;
     display:flex;
     justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
   }
   .btn-gold{
     appearance:none;
@@ -585,6 +775,16 @@
     transform:translateY(-3px);
     border-color:rgba(212,168,67,.45);
     box-shadow:0 12px 26px rgba(0,0,0,.45);
+  }
+  .stats-grid .stat{animation:statIn .5s var(--ease) both}
+  .stats-grid .stat:nth-child(1){animation-delay:.04s}
+  .stats-grid .stat:nth-child(2){animation-delay:.08s}
+  .stats-grid .stat:nth-child(3){animation-delay:.12s}
+  .stats-grid .stat:nth-child(4){animation-delay:.16s}
+  .stats-grid .stat:nth-child(5){animation-delay:.2s}
+  @keyframes statIn{
+    from{opacity:0; transform:translateY(10px)}
+    to{opacity:1; transform:translateY(0)}
   }
   .stat-ico{
     font-size:20px;
@@ -732,6 +932,7 @@
   }
   .modal-ico{font-size:34px;line-height:1;margin-bottom:10px}
   .modal-title{
+    margin-top:0;
     font-family:'Cinzel', serif;
     font-size:16px;
     font-weight:700;
@@ -767,6 +968,145 @@
   .breakdown-row .num{font-variant-numeric:tabular-nums;color:var(--muted)}
   .breakdown-row .num.profit{color:var(--green)}
   .breakdown-row .num.loss{color:var(--red)}
+  .cascade{margin-top:16px;border:1px solid rgba(212,168,67,.18);border-radius:12px;overflow:hidden}
+  .cascade-toggle{
+    width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:12px 14px;background:rgba(212,168,67,.06);border:0;cursor:pointer;
+    color:var(--text-strong);font-size:13px;font-weight:600;text-align:left;font-family:inherit;
+  }
+  .cascade-toggle:hover{background:rgba(212,168,67,.11)}
+  .cascade-arrow{transition:transform .2s ease;color:var(--gold)}
+  .cascade-arrow.open{transform:rotate(180deg)}
+  .cascade-body{padding:12px 14px;font-size:12.5px;line-height:1.6;max-height:280px;overflow-y:auto}
+  .cascade-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed rgba(255,255,255,.06);color:var(--muted)}
+  .cascade-row:last-child{border-bottom:0}
+  .cascade-n{color:var(--text-strong);font-weight:600;min-width:64px}
+  .cascade-ret{color:var(--gold)}
+  .cascade-note{padding:6px 0;color:var(--muted);font-style:italic}
+  .cascade-total{margin-top:8px;padding-top:8px;border-top:1px solid rgba(212,168,67,.16);color:var(--text-strong);font-weight:600}
+
+
+  /* ---------- ACCESSIBILITY / SEMANTICS ---------- */
+  .sr-only{
+    position:absolute;
+    width:1px;height:1px;
+    margin:-1px;padding:0;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
+  .skip-link{
+    position:absolute;
+    left:12px;
+    top:-64px;
+    z-index:100;
+    padding:10px 16px;
+    border-radius:10px;
+    background:var(--gold);
+    color:#1a1608;
+    font-weight:700;
+    text-decoration:none;
+    transition:top .2s var(--ease);
+  }
+  .skip-link:focus{top:12px}
+  main{display:block}
+  main:focus{outline:none}
+  dl,dd{margin:0}
+  ul.chips{list-style:none;margin:0;padding:0}
+  .hint{
+    color:#a3a8bb;
+    font-weight:500;
+    letter-spacing:.01em;
+    text-transform:none;
+  }
+  button:focus-visible,
+  .tab-btn:focus-visible,
+  .res:focus-visible,
+  .btn-del:focus-visible,
+  .top-btn:focus-visible{
+    outline:2px solid var(--gold-bright);
+    outline-offset:3px;
+  }
+  .input-wrap input:focus-visible{outline:2px solid var(--gold-bright);outline-offset:2px}
+
+
+  .grid-form.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  @media (max-width:860px){.grid-form.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:760px){.grid-form.grid-3{grid-template-columns:1fr}}
+
+
+  /* ---------- POLISH ---------- */
+  ::selection{background:rgba(212,168,67,.38);color:#fff}
+  input{caret-color:var(--gold-bright)}
+  .card-value,.stat-value,.overall-value{font-variant-numeric:tabular-nums}
+
+  /* сияние-прожектор за заголовком */
+  .hero{position:relative}
+  .hero::before{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:-34px;
+    width:min(640px,92vw);
+    height:280px;
+    transform:translateX(-50%);
+    background:radial-gradient(ellipse at 50% 38%, rgba(212,168,67,.17), rgba(212,168,67,.05) 45%, transparent 70%);
+    pointer-events:none;
+    z-index:-1;
+  }
+
+  /* панели: тонкий верхний блик и золотой ромб у заголовка */
+  .panel{box-shadow:var(--shadow), inset 0 1px 0 rgba(255,225,150,.08)}
+  .panel-head h2::before{
+    content:"◆";
+    content:"◆" / "";
+    display:inline-block;
+    margin-right:.75em;
+    font-size:.5em;
+    vertical-align:.28em;
+    color:var(--gold-bright);
+    text-shadow:0 0 10px rgba(240,192,64,.7);
+  }
+
+  /* золотая кнопка: блик при наведении */
+  .btn-gold{position:relative;overflow:hidden}
+  .btn-gold::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(110deg, transparent 32%, rgba(255,255,255,.38) 50%, transparent 68%);
+    transform:translateX(-130%);
+    transition:transform .7s var(--ease);
+    pointer-events:none;
+  }
+  .btn-gold:hover::after{transform:translateX(130%)}
+
+  /* каскадное появление панелей при открытии вкладки */
+  .tab-panel > .panel{animation:panelIn .55s var(--ease) backwards}
+  .tab-panel > .panel:nth-child(2){animation-delay:.07s}
+  .tab-panel > .panel:nth-child(3){animation-delay:.14s}
+  .tab-panel > .panel:nth-child(4){animation-delay:.21s}
+  .tab-panel > .panel:nth-child(5){animation-delay:.28s}
+  @keyframes panelIn{
+    from{opacity:0; transform:translateY(14px)}
+    to{opacity:1; transform:translateY(0)}
+  }
+
+  /* орнамент над подписью внизу */
+  .foot::before{
+    content:"";
+    display:block;
+    height:1px;
+    max-width:260px;
+    margin:0 auto 14px;
+    background:linear-gradient(90deg, transparent, rgba(212,168,67,.5), transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .btn-gold::after{display:none}
+    .tab-panel > .panel{animation:none}
+  }
 
   /* ---------- RESPONSIVE ---------- */
   @media (max-width:760px){
@@ -833,65 +1173,96 @@
 </head>
 <body>
 
+<a class="skip-link" href="#main">Перейти к калькулятору</a>
+
+<div class="embers" id="embers" aria-hidden="true"></div>
+
 <div class="wrap">
   <header class="hero">
-    <div class="crest">🧶</div>
-    <h1>Крафт ткани</h1>
-    <p class="sub">Albion Online · калькулятор рентабельности переработки</p>
+    <div class="crest" aria-hidden="true">⚔️</div>
+    <h1>Albion Калькулятор</h1>
+    <p class="sub">Albion Online · переработка и крафт плащей</p>
     <div class="rule"></div>
   </header>
 
-  <section class="panel">
+  <main id="main" tabindex="-1">
+
+  <div class="tabs" id="mainTabs" role="tablist" aria-label="Раздел калькулятора">
+    <button class="tab-btn active" type="button" id="tab-fabric" data-tab="fabric" role="tab" aria-selected="true" aria-controls="tabFabric" tabindex="0"><span aria-hidden="true">🧶</span> Переработка</button>
+    <button class="tab-btn" type="button" id="tab-cloak" data-tab="cloak" role="tab" aria-selected="false" aria-controls="tabCloak" tabindex="-1"><span aria-hidden="true">🧣</span> Плащи</button>
+  </div>
+
+  <section id="overallSummary" aria-labelledby="ovTitle" hidden>
+    <h2 class="sr-only" id="ovTitle">Итоговая прибыль по всем вкладкам</h2>
+    <dl class="overall-summary">
+      <div class="overall-item">
+        <dt class="overall-label"><span aria-hidden="true">🧶</span> Переработка</dt>
+        <dd class="overall-value" id="ovFabric">0</dd>
+      </div>
+      <div class="overall-item">
+        <dt class="overall-label"><span aria-hidden="true">🧣</span> Плащи</dt>
+        <dd class="overall-value" id="ovCloak">0</dd>
+      </div>
+      <div class="overall-item total">
+        <dt class="overall-label">Итого прибыль</dt>
+        <dd class="overall-value" id="ovTotal">0</dd>
+      </div>
+    </dl>
+  </section>
+
+  <div class="tab-panel" id="tabFabric" role="tabpanel" aria-labelledby="tab-fabric">
+
+  <section class="panel" aria-labelledby="sec-h1">
     <div class="panel-head">
-      <h2>Параметры расчёта</h2>
-      <button class="btn-ghost" id="resetBtn" type="button">↺ Сбросить</button>
+      <h2 id="sec-h1">Параметры расчёта</h2>
+      <button class="btn-ghost" id="resetBtn" type="button"><span aria-hidden="true">↺</span> Сбросить</button>
     </div>
 
-    <div class="resource-switch" id="resourceSwitch" role="tablist" aria-label="Тип ресурса">
-      <button class="res active" type="button" data-res="cotton">🧶 Хлопок</button>
-      <button class="res" type="button" data-res="flax">🌾 Лён</button>
-      <button class="res" type="button" data-res="hide">🐄 Кожа</button>
-      <button class="res" type="button" data-res="ore">⛏️ Металл</button>
+    <div class="resource-switch" id="resourceSwitch" role="group" aria-label="Тип ресурса">
+      <button class="res active" type="button" data-res="cotton" aria-pressed="true"><span aria-hidden="true">🧶</span> Хлопок</button>
+      <button class="res" type="button" data-res="flax" aria-pressed="false"><span aria-hidden="true">🌾</span> Лён</button>
+      <button class="res" type="button" data-res="hide" aria-pressed="false"><span aria-hidden="true">🐄</span> Кожа</button>
+      <button class="res" type="button" data-res="ore" aria-pressed="false"><span aria-hidden="true">⛏️</span> Металл</button>
     </div>
 
-    <span class="field-label" style="margin:0 0 8px"><span class="ico">⭐</span>Тир предмета <span style="opacity:.6">— определяет соотношение сырьё : изделие</span></span>
-    <div class="resource-switch cols-5" id="tierSwitch" role="tablist" aria-label="Тир предмета">
-      <button class="res" type="button" data-tier="4">T4 · 2:1</button>
-      <button class="res" type="button" data-tier="5">T5 · 3:1</button>
-      <button class="res active" type="button" data-tier="6">T6 · 4:1</button>
-      <button class="res" type="button" data-tier="7">T7 · 5:1</button>
-      <button class="res" type="button" data-tier="8">T8 · 6:1</button>
+    <span class="field-label" id="tierLabel" style="margin:0 0 8px"><span class="ico" aria-hidden="true">⭐</span>Тир предмета <span class="hint">— определяет соотношение сырьё : изделие</span></span>
+    <div class="resource-switch cols-5" id="tierSwitch" role="group" aria-labelledby="tierLabel">
+      <button class="res" type="button" data-tier="4" aria-pressed="false">T4 · 2:1</button>
+      <button class="res" type="button" data-tier="5" aria-pressed="false">T5 · 3:1</button>
+      <button class="res active" type="button" data-tier="6" aria-pressed="true">T6 · 4:1</button>
+      <button class="res" type="button" data-tier="7" aria-pressed="false">T7 · 5:1</button>
+      <button class="res" type="button" data-tier="8" aria-pressed="false">T8 · 6:1</button>
     </div>
 
     <div class="grid-form">
       <label class="field">
-        <span class="field-label"><span class="ico">💰</span><span id="buyLabel">Цена хлопка</span></span>
+        <span class="field-label"><span class="ico" aria-hidden="true">💰</span><span id="buyLabel">Цена хлопка</span></span>
         <span class="input-wrap">
-          <input type="number" id="buyPrice" value="4300" min="0" step="10" inputmode="decimal" placeholder="0">
+          <input type="number" autocomplete="off" id="buyPrice" value="4300" min="0" step="10" inputmode="decimal" placeholder="0">
           <span class="unit">серебро</span>
         </span>
       </label>
 
       <label class="field">
-        <span class="field-label"><span class="ico">🏷️</span><span id="sellLabel">Цена ткани при продаже</span></span>
+        <span class="field-label"><span class="ico" aria-hidden="true">🏷️</span><span id="sellLabel">Цена ткани при продаже</span></span>
         <span class="input-wrap">
-          <input type="number" id="sellPrice" value="9400" min="0" step="10" inputmode="decimal" placeholder="0">
+          <input type="number" autocomplete="off" id="sellPrice" value="9400" min="0" step="10" inputmode="decimal" placeholder="0">
           <span class="unit">серебро</span>
         </span>
       </label>
 
       <label class="field">
-        <span class="field-label"><span class="ico">📦</span><span id="amountLabel">Количество хлопка</span></span>
+        <span class="field-label"><span class="ico" aria-hidden="true">📦</span><span id="amountLabel">Количество хлопка</span></span>
         <span class="input-wrap">
-          <input type="number" id="amount" value="2000" min="1" step="1" inputmode="numeric" placeholder="0">
+          <input type="number" autocomplete="off" id="amount" value="2000" min="1" step="1" inputmode="numeric" placeholder="0">
           <span class="unit">шт.</span>
         </span>
       </label>
 
       <label class="field">
-        <span class="field-label"><span class="ico">📊</span>Налог на продажу</span>
+        <span class="field-label"><span class="ico" aria-hidden="true">📊</span>Налог на продажу <span class="hint">(рынок + 2.5% за выставление)</span></span>
         <span class="input-wrap">
-          <input type="number" id="taxRate" value="8" min="0" max="100" step="0.1" inputmode="decimal" placeholder="0">
+          <input type="number" autocomplete="off" id="taxRate" value="10.5" min="0" max="100" step="0.1" inputmode="decimal" placeholder="0">
           <span class="unit">%</span>
         </span>
       </label>
@@ -900,36 +1271,36 @@
     <div class="focus-row">
       <div class="switch-group">
         <label class="switch">
-          <input type="checkbox" id="usePremium">
+          <input type="checkbox" id="usePremium" role="switch">
           <span class="track"><span class="thumb"></span></span>
           <span class="switch-text">
             Премиум-аккаунт
-            <em id="premiumHint">налог 4% вместо 8%</em>
+            <small id="premiumHint">налог 6.5% вместо 10.5%</small>
           </span>
         </label>
 
         <label class="switch">
-          <input type="checkbox" id="useFocus">
+          <input type="checkbox" id="useFocus" role="switch">
           <span class="track"><span class="thumb"></span></span>
           <span class="switch-text">
             Использовать фокусировку
-            <em id="focusHint">возврат 53.9% вместо 36.5%</em>
+            <small id="focusHint">возврат 53.9% вместо 36.5%</small>
           </span>
         </label>
       </div>
 
       <div class="grid-form focus-points" id="focusPointsRow" hidden>
         <label class="field">
-          <span class="field-label"><span class="ico">🔷</span>Фокус на ед. сырья</span>
+          <span class="field-label"><span class="ico" aria-hidden="true">🔷</span>Фокус на ед. сырья</span>
           <span class="input-wrap">
-            <input type="number" id="focusCost" min="0" step="1" inputmode="numeric" placeholder="0">
+            <input type="number" autocomplete="off" id="focusCost" min="0" step="1" inputmode="numeric" placeholder="0">
             <span class="unit">фок.</span>
           </span>
         </label>
         <label class="field">
-          <span class="field-label"><span class="ico">🔋</span>Доступно фокуса</span>
+          <span class="field-label"><span class="ico" aria-hidden="true">🔋</span>Доступно фокуса</span>
           <span class="input-wrap">
-            <input type="number" id="focusAvailable" min="0" step="1" inputmode="numeric" placeholder="0">
+            <input type="number" autocomplete="off" id="focusAvailable" min="0" step="1" inputmode="numeric" placeholder="0">
             <span class="unit">фок.</span>
           </span>
         </label>
@@ -937,62 +1308,82 @@
     </div>
   </section>
 
-  <section class="panel" aria-live="polite">
+  <section class="panel" aria-labelledby="sec-h2">
     <div class="panel-head">
-      <h2>Результаты</h2>
-      <div class="chips" id="chips"></div>
+      <h2 id="sec-h2">Результаты переработки</h2>
+      <ul class="chips" id="chips" aria-label="Параметры расчёта"></ul>
     </div>
 
     <div class="empty" id="emptyState">Заполните все поля, чтобы увидеть расчёт</div>
 
     <div class="results-grid" id="resultsGrid" hidden>
       <div class="card" id="cardCloth">
-        <div class="card-icon">🧵</div>
-        <div class="card-label">Произведено</div>
-        <div class="card-value" id="vCloth">0</div>
-        <div class="card-sub" id="sCloth">единиц</div>
+        <div class="card-icon" aria-hidden="true">🧵</div>
+        <dl>
+          <dt class="card-label">Произведено</dt>
+          <dd class="card-value" id="vCloth">0</dd>
+          <dd class="card-sub" id="sCloth">единиц</dd>
+        </dl>
       </div>
 
       <div class="card">
-        <div class="card-icon">💰</div>
-        <div class="card-label">Затраты на сырьё</div>
-        <div class="card-value" id="vCost">0</div>
-        <div class="card-sub">серебра · полный закуп</div>
+        <div class="card-icon" aria-hidden="true">💰</div>
+        <dl>
+          <dt class="card-label">Затраты на сырьё</dt>
+          <dd class="card-value" id="vCost">0</dd>
+          <dd class="card-sub">серебра · полный закуп</dd>
+        </dl>
       </div>
 
       <div class="card">
-        <div class="card-icon">📈</div>
-        <div class="card-label">Доход от продажи</div>
-        <div class="card-value" id="vRevenue">0</div>
-        <div class="card-sub" id="sRevenue">серебра · после налога</div>
+        <div class="card-icon" aria-hidden="true">📈</div>
+        <dl>
+          <dt class="card-label">Доход от продажи</dt>
+          <dd class="card-value" id="vRevenue">0</dd>
+          <dd class="card-sub" id="sRevenue">серебра · после налога</dd>
+        </dl>
       </div>
 
       <div class="card" id="cardProfit">
-        <div class="card-icon" id="iProfit">✅</div>
-        <div class="card-label">Чистая прибыль</div>
-        <div class="card-value" id="vProfit">0</div>
-        <div class="card-sub" id="sProfit">серебра</div>
+        <div class="card-icon" aria-hidden="true" id="iProfit">✅</div>
+        <dl>
+          <dt class="card-label">Чистая прибыль</dt>
+          <dd class="card-value" id="vProfit">0</dd>
+          <dd class="card-sub" id="sProfit">серебра</dd>
+        </dl>
       </div>
 
       <div class="card" id="cardPer">
-        <div class="card-icon">📊</div>
-        <div class="card-label">Прибыль за единицу</div>
-        <div class="card-value" id="vPer">0</div>
-        <div class="card-sub" id="sPer">серебра / единица</div>
+        <div class="card-icon" aria-hidden="true">📊</div>
+        <dl>
+          <dt class="card-label">Прибыль за единицу</dt>
+          <dd class="card-value" id="vPer">0</dd>
+          <dd class="card-sub" id="sPer">серебра / единица</dd>
+        </dl>
       </div>
 
       <div class="card">
-        <div class="card-icon">♻️</div>
-        <div class="card-label">Неиспользовано</div>
-        <div class="card-value" id="vLeft">0</div>
-        <div class="card-sub" id="sLeft">эквивалент сырья</div>
+        <div class="card-icon" aria-hidden="true">♻️</div>
+        <dl>
+          <dt class="card-label">Неиспользовано</dt>
+          <dd class="card-value" id="vLeft">0</dd>
+          <dd class="card-sub" id="sLeft">эквивалент сырья</dd>
+        </dl>
       </div>
     </div>
 
     <div class="focus-warn" id="focusWarn" hidden></div>
 
+    <div class="cascade" id="cascadeBlock" hidden>
+      <button type="button" class="cascade-toggle" id="cascadeToggle" aria-expanded="false" aria-controls="cascadeBody">
+        <span><span aria-hidden="true">🔄</span> Куда уходит возврат сырья — показать волны переработки</span>
+        <span class="cascade-arrow" id="cascadeArrow" aria-hidden="true">▾</span>
+      </button>
+      <div class="cascade-body" id="cascadeBody" hidden></div>
+    </div>
+
     <div class="tip" id="tipBlock" hidden>
-      <div class="tip-ico">💡</div>
+      <div class="tip-ico" aria-hidden="true">💡</div>
       <div>
         <div class="tip-title">Совет по оптимизации</div>
         <div class="tip-text" id="tipText"></div>
@@ -1000,50 +1391,36 @@
     </div>
 
     <div class="actions" id="saveRow" hidden>
-      <button class="btn-gold" id="saveBtn" type="button">💾 Сохранить продажу</button>
+      <button class="btn-gold" id="saveBtn" type="button"><span aria-hidden="true">💾</span> Сохранить продажу</button>
+      <button class="btn-ghost" id="copyBtn" type="button"><span aria-hidden="true">📋</span> Скопировать результат</button>
     </div>
   </section>
 
-  <section class="panel stats-panel">
+  <section class="panel stats-panel" aria-labelledby="sec-h3">
     <div class="panel-head">
-      <h2>Общая статистика</h2>
+      <h2 id="sec-h3">Общая статистика</h2>
     </div>
 
     <div class="stats-grid">
       <div class="stat">
-        <div class="stat-ico">📦</div>
-        <div class="stat-body">
-          <div class="stat-label">Всего продаж</div>
-          <div class="stat-value" id="statCount">0</div>
-        </div>
+        <div class="stat-ico" aria-hidden="true">📦</div>
+        <dl class="stat-body"><dt class="stat-label">Всего продаж</dt><dd class="stat-value" id="statCount">0</dd></dl>
       </div>
       <div class="stat">
-        <div class="stat-ico">🧵</div>
-        <div class="stat-body">
-          <div class="stat-label">Всего ткани произведено</div>
-          <div class="stat-value" id="statCloth">0</div>
-        </div>
+        <div class="stat-ico" aria-hidden="true">🧵</div>
+        <dl class="stat-body"><dt class="stat-label">Всего ткани произведено</dt><dd class="stat-value" id="statCloth">0</dd></dl>
       </div>
       <div class="stat">
-        <div class="stat-ico">💰</div>
-        <div class="stat-body">
-          <div class="stat-label">Общая прибыль</div>
-          <div class="stat-value" id="statProfit">0</div>
-        </div>
+        <div class="stat-ico" aria-hidden="true">💰</div>
+        <dl class="stat-body"><dt class="stat-label">Общая прибыль</dt><dd class="stat-value" id="statProfit">0</dd></dl>
       </div>
       <div class="stat">
-        <div class="stat-ico">📊</div>
-        <div class="stat-body">
-          <div class="stat-label">Средняя прибыль за продажу</div>
-          <div class="stat-value" id="statAvg">0</div>
-        </div>
+        <div class="stat-ico" aria-hidden="true">📊</div>
+        <dl class="stat-body"><dt class="stat-label">Средняя прибыль за продажу</dt><dd class="stat-value" id="statAvg">0</dd></dl>
       </div>
       <div class="stat">
-        <div class="stat-ico">🌿</div>
-        <div class="stat-body">
-          <div class="stat-label">Всего сырья израсходовано</div>
-          <div class="stat-value" id="statRaw">0</div>
-        </div>
+        <div class="stat-ico" aria-hidden="true">🌿</div>
+        <dl class="stat-body"><dt class="stat-label">Всего сырья израсходовано</dt><dd class="stat-value" id="statRaw">0</dd></dl>
       </div>
     </div>
 
@@ -1053,9 +1430,9 @@
     </div>
   </section>
 
-  <section class="panel hist-panel">
+  <section class="panel hist-panel" aria-labelledby="sec-h4">
     <div class="panel-head">
-      <h2>История продаж</h2>
+      <h2 id="sec-h4">История продаж</h2>
       <span class="chip" id="histCount">0 записей</span>
     </div>
 
@@ -1063,13 +1440,14 @@
 
     <div class="table-wrap" id="historyWrap" hidden>
       <table class="hist-table">
+        <caption class="sr-only">История продаж переработки</caption>
         <thead>
           <tr>
-            <th>Дата</th>
-            <th>Кол-во хлопка</th>
-            <th>Произведено ткани</th>
-            <th>Прибыль</th>
-            <th class="col-actions">Удалить</th>
+            <th scope="col">Дата</th>
+            <th scope="col">Кол-во хлопка</th>
+            <th scope="col">Произведено ткани</th>
+            <th scope="col">Прибыль</th>
+            <th scope="col" class="col-actions">Удалить</th>
           </tr>
         </thead>
         <tbody id="historyBody"></tbody>
@@ -1077,20 +1455,286 @@
     </div>
 
     <div class="hist-foot" id="clearRow" hidden>
-      <button class="btn-ghost" id="clearAllBtn" type="button">🗑️ Очистить всю историю</button>
+      <button class="btn-ghost" id="clearAllBtn" type="button"><span aria-hidden="true">🗑️</span> Очистить всю историю</button>
     </div>
   </section>
 
-  <p class="foot">Расчёт носит оценочный характер · данные рынка вводите вручную</p>
+  </div>
+
+  <div class="tab-panel" id="tabCloak" role="tabpanel" aria-labelledby="tab-cloak" hidden>
+
+  <section class="panel" aria-labelledby="sec-h5">
+    <div class="panel-head">
+      <h2 id="sec-h5">Материалы на плащ</h2>
+      <button class="btn-ghost" id="cloakResetBtn" type="button"><span aria-hidden="true">↺</span> Сбросить</button>
+    </div>
+
+    <div class="grid-form grid-3">
+      <label class="field">
+        <span class="field-label"><span class="ico" aria-hidden="true">🧣</span>Цена обычного плаща</span>
+        <span class="input-wrap">
+          <input type="number" autocomplete="off" id="cloakPrice" value="0" min="0" step="10" inputmode="decimal" placeholder="0">
+          <span class="unit">серебро</span>
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="field-label"><span class="ico" aria-hidden="true">❤️</span>Цена Сердца</span>
+        <span class="input-wrap">
+          <input type="number" autocomplete="off" id="heartPrice" value="0" min="0" step="10" inputmode="decimal" placeholder="0">
+          <span class="unit">серебро</span>
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="field-label"><span class="ico" aria-hidden="true">🚩</span>Цена Знамени</span>
+        <span class="input-wrap">
+          <input type="number" autocomplete="off" id="bannerPrice" value="0" min="0" step="10" inputmode="decimal" placeholder="0">
+          <span class="unit">серебро</span>
+        </span>
+      </label>
+    </div>
+
+    <div class="field-label" style="margin:18px 0 8px">
+      <span class="ico" aria-hidden="true">🧪</span>Материалы зачарования <span class="hint">— на крафт нужно по 96 шт. каждого, вводите цену сразу за стек 96</span>
+    </div>
+    <div class="grid-form grid-3">
+      <label class="field">
+        <span class="field-label"><span class="ico" aria-hidden="true">💠</span>Цена Реликвии за 96</span>
+        <span class="input-wrap">
+          <input type="number" autocomplete="off" id="artifactPrice" value="0" min="0" step="10" inputmode="decimal" placeholder="0">
+          <span class="unit">серебро</span>
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="field-label"><span class="ico" aria-hidden="true">👻</span>Цена Души за 96</span>
+        <span class="input-wrap">
+          <input type="number" autocomplete="off" id="soulsPrice" value="0" min="0" step="10" inputmode="decimal" placeholder="0">
+          <span class="unit">серебро</span>
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="field-label"><span class="ico" aria-hidden="true">🔮</span>Цена Руны за 96</span>
+        <span class="input-wrap">
+          <input type="number" autocomplete="off" id="runesPrice" value="0" min="0" step="10" inputmode="decimal" placeholder="0">
+          <span class="unit">серебро</span>
+        </span>
+      </label>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="sec-h6">
+    <div class="panel-head">
+      <h2 id="sec-h6">Крафт и продажа</h2>
+    </div>
+
+    <div class="grid-form">
+      <label class="field">
+        <span class="field-label"><span class="ico" aria-hidden="true">🏛️</span>Налог на крафт (станция)</span>
+        <span class="input-wrap">
+          <input type="number" autocomplete="off" id="craftingFee" value="4" min="0" max="100" step="0.1" inputmode="decimal" placeholder="0">
+          <span class="unit">%</span>
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="field-label"><span class="ico" aria-hidden="true">🏷️</span>Цена продажи плаща</span>
+        <span class="input-wrap">
+          <input type="number" autocomplete="off" id="cloakSellPrice" value="0" min="0" step="10" inputmode="decimal" placeholder="0">
+          <span class="unit">серебро</span>
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="field-label"><span class="ico" aria-hidden="true">📊</span>Налог на продажу <span class="hint">(рынок + 2.5% за выставление)</span></span>
+        <span class="input-wrap">
+          <input type="number" autocomplete="off" id="cloakMarketTax" value="10.5" min="0" max="100" step="0.1" inputmode="decimal" placeholder="0">
+          <span class="unit">%</span>
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="field-label"><span class="ico" aria-hidden="true">📦</span>Количество крафтов</span>
+        <span class="input-wrap">
+          <input type="number" autocomplete="off" id="cloakBatch" value="1" min="1" step="1" inputmode="numeric" placeholder="1">
+          <span class="unit">шт.</span>
+        </span>
+      </label>
+    </div>
+
+    <div class="focus-row">
+      <label class="switch">
+        <input type="checkbox" id="cloakPremium" role="switch">
+        <span class="track"><span class="thumb"></span></span>
+        <span class="switch-text">
+          Премиум-аккаунт
+          <small>налог 6.5% вместо 10.5%</small>
+        </span>
+      </label>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="sec-h7">
+    <div class="panel-head">
+      <h2 id="sec-h7">Результаты крафта плащей</h2>
+      <ul class="chips" id="cloakChips" aria-label="Параметры расчёта"></ul>
+    </div>
+
+    <div class="empty" id="cloakEmptyState">Укажите цену продажи, чтобы увидеть расчёт</div>
+
+    <div class="results-grid" id="cloakResultsGrid" hidden>
+      <div class="card">
+        <div class="card-icon" aria-hidden="true">💰</div>
+        <dl>
+          <dt class="card-label">Себестоимость крафта</dt>
+          <dd class="card-value" id="cVCost">0</dd>
+          <dd class="card-sub" id="cSCost">серебра за крафт</dd>
+        </dl>
+      </div>
+
+      <div class="card">
+        <div class="card-icon" aria-hidden="true">💵</div>
+        <dl>
+          <dt class="card-label">Чистая выручка</dt>
+          <dd class="card-value" id="cVRevenue">0</dd>
+          <dd class="card-sub" id="cSRevenue">серебра за крафт</dd>
+        </dl>
+      </div>
+
+      <div class="card" id="cCardProfit">
+        <div class="card-icon" aria-hidden="true" id="cIProfit">✅</div>
+        <dl>
+          <dt class="card-label">Чистая прибыль</dt>
+          <dd class="card-value" id="cVProfit">0</dd>
+          <dd class="card-sub" id="cSProfit">серебра за крафт</dd>
+        </dl>
+      </div>
+
+      <div class="card" id="cCardRoi">
+        <div class="card-icon" aria-hidden="true">📊</div>
+        <dl>
+          <dt class="card-label">Рентабельность (ROI)</dt>
+          <dd class="card-value" id="cVRoi">0%</dd>
+          <dd class="card-sub">от себестоимости</dd>
+        </dl>
+      </div>
+
+      <div class="card" id="cCardBatchCost">
+        <div class="card-icon" aria-hidden="true">📦</div>
+        <dl>
+          <dt class="card-label">Себестоимость всех плащей</dt>
+          <dd class="card-value" id="cVBatchCost">0</dd>
+          <dd class="card-sub">серебра за <span id="cBatchLabel">1</span> шт.</dd>
+        </dl>
+      </div>
+
+      <div class="card" id="cCardBatch">
+        <div class="card-icon" aria-hidden="true">💎</div>
+        <dl>
+          <dt class="card-label">Прибыль всей партии</dt>
+          <dd class="card-value" id="cVBatchProfit">0</dd>
+          <dd class="card-sub" id="cSBatchProfit">серебра за всю партию</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="breakdown" id="cloakBreakdown" hidden>
+      <div class="breakdown-title">Разбивка себестоимости (за 1 крафт)</div>
+      <div class="breakdown-list" id="cloakBreakdownList"></div>
+    </div>
+
+    <div class="tip" id="cloakTipBlock" hidden>
+      <div class="tip-ico" aria-hidden="true">💡</div>
+      <div>
+        <div class="tip-title">Совет по рентабельности</div>
+        <div class="tip-text" id="cloakTipText"></div>
+      </div>
+    </div>
+
+    <div class="actions" id="cloakSaveRow" hidden>
+      <button class="btn-gold" id="cloakSaveBtn" type="button"><span aria-hidden="true">💾</span> Сохранить крафт</button>
+      <button class="btn-ghost" id="cloakCopyBtn" type="button"><span aria-hidden="true">📋</span> Скопировать результат</button>
+    </div>
+  </section>
+
+  <section class="panel stats-panel" aria-labelledby="sec-h8">
+    <div class="panel-head">
+      <h2 id="sec-h8">Общая статистика по плащам</h2>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-ico" aria-hidden="true">📦</div>
+        <dl class="stat-body"><dt class="stat-label">Всего сохранённых крафтов</dt><dd class="stat-value" id="cStatCount">0</dd></dl>
+      </div>
+      <div class="stat">
+        <div class="stat-ico" aria-hidden="true">🧣</div>
+        <dl class="stat-body"><dt class="stat-label">Всего плащей скрафчено</dt><dd class="stat-value" id="cStatCloaks">0</dd></dl>
+      </div>
+      <div class="stat">
+        <div class="stat-ico" aria-hidden="true">💰</div>
+        <dl class="stat-body"><dt class="stat-label">Общая прибыль</dt><dd class="stat-value" id="cStatProfit">0</dd></dl>
+      </div>
+      <div class="stat">
+        <div class="stat-ico" aria-hidden="true">📊</div>
+        <dl class="stat-body"><dt class="stat-label">Средняя прибыль за 1 плащ</dt><dd class="stat-value" id="cStatAvg">0</dd></dl>
+      </div>
+      <div class="stat">
+        <div class="stat-ico" aria-hidden="true">📈</div>
+        <dl class="stat-body"><dt class="stat-label">Средняя рентабельность</dt><dd class="stat-value" id="cStatRoi">0</dd></dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel hist-panel" aria-labelledby="sec-h9">
+    <div class="panel-head">
+      <h2 id="sec-h9">История крафтов плащей</h2>
+      <span class="chip" id="cHistCount">0 записей</span>
+    </div>
+
+    <div class="hist-empty" id="cloakHistoryEmpty">Пока нет сохранённых крафтов</div>
+
+    <div class="table-wrap" id="cloakHistoryWrap" hidden>
+      <table class="hist-table">
+        <caption class="sr-only">История крафтов плащей</caption>
+        <thead>
+          <tr>
+            <th scope="col">Дата</th>
+            <th scope="col">Партия</th>
+            <th scope="col">Себестоимость</th>
+            <th scope="col">Прибыль</th>
+            <th scope="col">ROI</th>
+            <th scope="col" class="col-actions">Удалить</th>
+          </tr>
+        </thead>
+        <tbody id="cloakHistoryBody"></tbody>
+      </table>
+    </div>
+
+    <div class="hist-foot" id="cloakClearRow" hidden>
+      <button class="btn-ghost" id="cloakClearAllBtn" type="button"><span aria-hidden="true">🗑️</span> Очистить всю историю</button>
+    </div>
+  </section>
+
+  </div>
+  </main>
+
+  <footer class="foot">Расчёт носит оценочный характер · данные рынка вводите вручную</footer>
 </div>
+
+<button type="button" class="top-btn" id="topBtn" aria-label="Наверх">↑</button>
+
+<div class="sr-only" id="srStatus" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <div class="modal-backdrop" id="confirmModal" hidden>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-ico">⚠️</div>
-    <div class="modal-title" id="modalTitle">Очистить историю?</div>
-    <p class="modal-text">Вы уверены? Все данные будут удалены.</p>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalText">
+    <div class="modal-ico" aria-hidden="true">⚠️</div>
+    <h2 class="modal-title" id="modalTitle">Очистить историю?</h2>
+    <p class="modal-text" id="modalText">Вы уверены? Все данные будут удалены.</p>
     <div class="modal-actions">
       <button class="btn-ghost" id="modalCancel" type="button">Отмена</button>
       <button class="btn-danger" id="modalConfirm" type="button">Удалить всё</button>
@@ -1115,7 +1759,7 @@
   // на любом материале при одном тире соотношение одинаковое.
   var TIER_RATIO = { 4: 2, 5: 3, 6: 4, 7: 5, 8: 6 };
 
-  var TAX = { normal: 8, premium: 4 };
+  var TAX = { normal: 10.5, premium: 6.5 }; // рыночный налог (8%/4%) + 2.5% за выставление ордера
   var REFUND = { base: 36.5, focus: 53.9 };
 
   var state = { res: "cotton", tier: 6, focus: false, premium: false };
@@ -1178,6 +1822,7 @@
     $("resultsGrid").classList.remove("in");
     $("tipBlock").hidden = true;
     $("focusWarn").hidden = true;
+    $("cascadeBlock").hidden = true;
     $("saveRow").hidden = true;
     $("chips").innerHTML = "";
   }
@@ -1185,12 +1830,12 @@
   function renderChips(tax, refund) {
     var r = RESOURCES[state.res];
     var out = [
-      '<span class="chip gold">' + r.short + " → " + r.out + " · T" + state.tier + "</span>",
-      '<span class="chip">Налог ' + tax + "%</span>",
-      '<span class="chip">Возврат ' + refund + "%</span>",
-      '<span class="chip">' + (state.premium ? "⭐ Премиум" : "Без премиума") + "</span>",
-      '<span class="chip">' + (state.focus ? "🧠 Фокусировка" : "Без фокусировки") + "</span>",
-      '<span class="chip">Рецепт ' + TIER_RATIO[state.tier] + " : 1</span>"
+      '<li class="chip gold">' + r.short + " → " + r.out + " · T" + state.tier + "</li>",
+      '<li class="chip">Налог ' + tax + "%</li>",
+      '<li class="chip">Возврат ' + refund + "%</li>",
+      '<li class="chip">' + (state.premium ? "⭐ Премиум" : "Без премиума") + "</li>",
+      '<li class="chip">' + (state.focus ? "🧠 Фокусировка" : "Без фокусировки") + "</li>",
+      '<li class="chip">Рецепт ' + TIER_RATIO[state.tier] + " : 1</li>"
     ];
     $("chips").innerHTML = out.join("");
   }
@@ -1228,6 +1873,7 @@
 
     if (buy <= 0 || sell <= 0 || amount <= 0) {
       showEmpty();
+      saveSettings();
       return;
     }
 
@@ -1270,7 +1916,8 @@
       premium: state.premium,
       produced: produced,
       profit: profit,
-      margin: margin
+      margin: margin,
+      refund: refund
     };
 
     var wasHidden = $("resultsGrid").hidden;
@@ -1337,11 +1984,81 @@
       void $("tipBlock").offsetWidth;
       $("tipBlock").style.animation = "";
     }
+
+    renderCascade();
+    if (animate) {
+      announce("Произведено " + fmtInt.format(produced) + " ед. Чистая прибыль " + formatProfit(profit) +
+        " серебра, рентабельность " + fmtDec.format(margin) + "%." +
+        ($("focusWarn").hidden ? "" : " Внимание: фокуса не хватает на всю партию."));
+    }
+    saveSettings();
+  }
+
+  /* ---------- RECURSIVE RETURN CASCADE ----------
+     Возвращённое сырьё можно скормить в переработку заново, оно снова
+     частично вернётся, и так далее — геометрически убывающими волнами.
+     effectivePerUnit = ratio * (1 - refund) — это ЗАМКНУТАЯ ФОРМА суммы
+     этого бесконечного ряда, поэтому итоговое produced уже её учитывает.
+     Этот блок просто показывает волны отдельно, для наглядности. */
+  function computeWaves(amount, ratio, refundPct) {
+    var refund = refundPct / 100;
+    var waves = [];
+    var remaining = amount;
+    var round = 0;
+    var totalProduced = 0;
+
+    while (remaining >= ratio && round < 20) {
+      round++;
+      var produced = Math.floor(remaining / ratio);
+      var consumed = produced * ratio;
+      var leftover = remaining - consumed;
+      var returned = consumed * refund;
+      totalProduced += produced;
+      waves.push({ round: round, spent: remaining, produced: produced, returned: returned });
+      remaining = leftover + returned;
+    }
+
+    return { waves: waves, totalProduced: totalProduced, dust: remaining };
+  }
+
+  function renderCascade() {
+    var block = $("cascadeBlock");
+    if (!block) return;
+    var body = $("cascadeBody");
+
+    if (!lastCalc || lastCalc.produced <= 0) {
+      block.hidden = true;
+      body.innerHTML = "";
+      return;
+    }
+
+    block.hidden = false;
+
+    var ratio = TIER_RATIO[lastCalc.tier];
+    var result = computeWaves(lastCalc.amount, ratio, lastCalc.refund);
+
+    var rows = result.waves.map(function (w) {
+      return '<div class="cascade-row">' +
+        '<span class="cascade-n">Волна ' + w.round + "</span>" +
+        "<span>" + fmtInt.format(Math.round(w.spent)) + " сырья → " + fmtInt.format(w.produced) + " изд.</span>" +
+        '<span class="cascade-ret">возврат ' + fmtInt.format(Math.round(w.returned)) + "</span>" +
+        "</div>";
+    }).join("");
+
+    var truncatedNote = result.waves.length >= 20
+      ? '<div class="cascade-note">…дальше остаток слишком мал, чтобы влиять на итог.</div>'
+      : "";
+
+    body.innerHTML = rows + truncatedNote +
+      '<div class="cascade-total">Сумма по волнам: ' + fmtInt.format(result.totalProduced) +
+      " изд. — совпадает с produced из формулы выше (расхождение — округление на последней крохе сырья, ≈" +
+      fmtDec.format(result.dust) + " ед.)</div>";
   }
 
   /* ---------- SALES HISTORY (localStorage) ---------- */
   var STORE_KEY = "albion.cloth.sales.v1";
   var sales = [];
+  var cloakSales = []; // объявлено здесь, чтобы сводка по обеим вкладкам была безопасна при любом порядке инициализации
   var toastTimer = null;
 
   function showToast(text, isError) {
@@ -1351,6 +2068,167 @@
     el.classList.add("show");
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { el.classList.remove("show"); }, 2000);
+  }
+
+  /* ---------- SCREEN-READER ANNOUNCEMENTS ---------- */
+  var announceTimer = null;
+  function announce(text) {
+    if (announceTimer) clearTimeout(announceTimer);
+    announceTimer = setTimeout(function () {
+      var el = $("srStatus");
+      if (el) el.textContent = text;
+    }, 900);
+  }
+
+  /* ---------- CLIPBOARD COPY ---------- */
+  function fallbackCopy(text) {
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      showToast("📋 Скопировано в буфер обмена");
+    } catch (e) {
+      showToast("⚠️ Не удалось скопировать", true);
+    }
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        showToast("📋 Скопировано в буфер обмена");
+      }).catch(function () { fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  /* ---------- REMEMBERED INPUT VALUES (localStorage) ---------- */
+  var SETTINGS_KEY = "albion.calc.settings.v1";
+
+  function saveSettings() {
+    try {
+      var data = {
+        fabric: {
+          res: state.res,
+          tier: state.tier,
+          premium: state.premium,
+          focus: state.focus,
+          buyPrice: $("buyPrice").value,
+          sellPrice: $("sellPrice").value,
+          amount: $("amount").value,
+          taxRate: $("taxRate").value,
+          focusCost: $("focusCost").value,
+          focusAvailable: $("focusAvailable").value
+        },
+        cloak: {
+          premium: $("cloakPremium").checked,
+          cloakPrice: $("cloakPrice").value,
+          heartPrice: $("heartPrice").value,
+          bannerPrice: $("bannerPrice").value,
+          artifactPrice: $("artifactPrice").value,
+          soulsPrice: $("soulsPrice").value,
+          runesPrice: $("runesPrice").value,
+          craftingFee: $("craftingFee").value,
+          cloakSellPrice: $("cloakSellPrice").value,
+          cloakMarketTax: $("cloakMarketTax").value,
+          cloakBatch: $("cloakBatch").value
+        }
+      };
+      window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
+    } catch (e) { /* хранилище недоступно — молча пропускаем */ }
+  }
+
+  function loadSettings() {
+    try {
+      var raw = window.localStorage.getItem(SETTINGS_KEY);
+      if (!raw) return null;
+      var data = JSON.parse(raw);
+      return data && typeof data === "object" ? data : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function applySettings(saved) {
+    if (!saved) return;
+
+    if (saved.fabric) {
+      var f = saved.fabric;
+      if (f.res && RESOURCES[f.res]) {
+        state.res = f.res;
+        var resButtons = document.querySelectorAll("#resourceSwitch .res");
+        for (var i = 0; i < resButtons.length; i++) {
+          resButtons[i].classList.toggle("active", resButtons[i].dataset.res === f.res);
+        }
+      }
+      if (f.tier && TIER_RATIO[f.tier]) {
+        state.tier = Number(f.tier);
+        var tierButtons = document.querySelectorAll("#tierSwitch .res");
+        for (var j = 0; j < tierButtons.length; j++) {
+          tierButtons[j].classList.toggle("active", Number(tierButtons[j].dataset.tier) === state.tier);
+        }
+      }
+      if (typeof f.premium === "boolean") {
+        state.premium = f.premium;
+        $("usePremium").checked = f.premium;
+      }
+      if (typeof f.focus === "boolean") {
+        state.focus = f.focus;
+        $("useFocus").checked = f.focus;
+        $("focusPointsRow").hidden = !f.focus;
+      }
+      if (f.buyPrice !== undefined) $("buyPrice").value = f.buyPrice;
+      if (f.sellPrice !== undefined) $("sellPrice").value = f.sellPrice;
+      if (f.amount !== undefined) $("amount").value = f.amount;
+      if (f.taxRate !== undefined) $("taxRate").value = f.taxRate;
+      if (f.focusCost !== undefined) $("focusCost").value = f.focusCost;
+      if (f.focusAvailable !== undefined) $("focusAvailable").value = f.focusAvailable;
+    }
+
+    if (saved.cloak) {
+      var c = saved.cloak;
+      if (typeof c.premium === "boolean") $("cloakPremium").checked = c.premium;
+      if (c.cloakPrice !== undefined) $("cloakPrice").value = c.cloakPrice;
+      if (c.heartPrice !== undefined) $("heartPrice").value = c.heartPrice;
+      if (c.bannerPrice !== undefined) $("bannerPrice").value = c.bannerPrice;
+      if (c.artifactPrice !== undefined) $("artifactPrice").value = c.artifactPrice;
+      if (c.soulsPrice !== undefined) $("soulsPrice").value = c.soulsPrice;
+      if (c.runesPrice !== undefined) $("runesPrice").value = c.runesPrice;
+      if (c.craftingFee !== undefined) $("craftingFee").value = c.craftingFee;
+      if (c.cloakSellPrice !== undefined) $("cloakSellPrice").value = c.cloakSellPrice;
+      if (c.cloakMarketTax !== undefined) $("cloakMarketTax").value = c.cloakMarketTax;
+      if (c.cloakBatch !== undefined) $("cloakBatch").value = c.cloakBatch;
+    }
+  }
+
+  /* ---------- COMBINED SUMMARY (both tabs) ---------- */
+  function setSign(el, v) {
+    el.classList.toggle("pos", v > 0);
+    el.classList.toggle("neg", v < 0);
+  }
+
+  function updateOverallSummary() {
+    var fabricProfit = sales.reduce(function (sum, s) { return sum + (Number(s.profit) || 0); }, 0);
+    var cloakProfit = cloakSales.reduce(function (sum, s) { return sum + (Number(s.batchProfit) || 0); }, 0);
+    var total = fabricProfit + cloakProfit;
+    var hasAny = sales.length > 0 || cloakSales.length > 0;
+
+    $("overallSummary").hidden = !hasAny;
+    if (!hasAny) return;
+
+    setText($("ovFabric"), formatProfit(fabricProfit) + " с");
+    setText($("ovCloak"), formatProfit(cloakProfit) + " с");
+    setText($("ovTotal"), formatProfit(total) + " с");
+
+    setSign($("ovFabric"), fabricProfit);
+    setSign($("ovCloak"), cloakProfit);
+    setSign($("ovTotal"), total);
   }
 
   function loadSales() {
@@ -1399,6 +2277,13 @@
     return (n > 0 ? "+" : "") + fmtInt.format(n);
   }
 
+  function makeTime(iso) {
+    var t = document.createElement("time");
+    t.dateTime = iso;
+    t.textContent = formatDate(iso);
+    return t;
+  }
+
   function makeCell(label) {
     var td = document.createElement("td");
     td.setAttribute("data-label", label);
@@ -1420,7 +2305,7 @@
       var tr = document.createElement("tr");
 
       var dateCell = makeCell("Дата");
-      dateCell.textContent = formatDate(sale.date);
+      dateCell.appendChild(makeTime(sale.date));
       tr.appendChild(dateCell);
 
       var amountCell = makeCell("Кол-во хлопка");
@@ -1485,12 +2370,11 @@
     animateNumber($("statAvg"), avg, function (v) { return fmtInt.format(v) + " серебра"; });
     animateNumber($("statRaw"), raw, function (v) { return fmtInt.format(v); });
 
-    $("statProfit").classList.toggle("pos", profit >= 0);
-    $("statProfit").classList.toggle("neg", profit < 0);
-    $("statAvg").classList.toggle("pos", avg >= 0);
-    $("statAvg").classList.toggle("neg", avg < 0);
+    setSign($("statProfit"), profit);
+    setSign($("statAvg"), avg);
 
     renderBreakdown();
+    updateOverallSummary();
   }
 
   function renderBreakdown() {
@@ -1574,13 +2458,29 @@
     showToast("🗑️ Запись удалена");
   }
 
-  function openConfirm() {
+  var confirmTarget = null; // "fabric" | "cloak"
+
+  var modalOpener = null;
+
+  function openConfirm(target) {
+    confirmTarget = target || "fabric";
+    modalOpener = document.activeElement;
+    setText($("modalTitle"), confirmTarget === "cloak" ? "Очистить историю крафтов плащей?" : "Очистить историю продаж?");
     $("confirmModal").hidden = false;
-    $("modalConfirm").focus();
+    var page = document.querySelector(".wrap");
+    if (page) page.inert = true;
+    $("modalCancel").focus(); // безопасный выбор по умолчанию для необратимого действия
   }
 
   function closeConfirm() {
     $("confirmModal").hidden = true;
+    confirmTarget = null;
+    var page = document.querySelector(".wrap");
+    if (page) page.inert = false;
+    // кнопка-источник могла исчезнуть (история очищена) — тогда фокус на основную область
+    var back = modalOpener && modalOpener.offsetParent !== null ? modalOpener : $("main");
+    if (back && back.focus) back.focus();
+    modalOpener = null;
   }
 
   function clearAll() {
@@ -1655,6 +2555,13 @@
     calculate(true);
   });
 
+  $("cascadeToggle").addEventListener("click", function () {
+    var open = $("cascadeBody").hidden;
+    $("cascadeBody").hidden = !open;
+    $("cascadeArrow").classList.toggle("open", open);
+    $("cascadeToggle").setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
   ["buyPrice", "sellPrice", "amount", "taxRate", "focusCost", "focusAvailable"].forEach(function (id) {
     $(id).addEventListener("input", function () { calculate(true); });
     $(id).addEventListener("change", function () { calculate(true); });
@@ -1664,21 +2571,531 @@
 
   $("saveBtn").addEventListener("click", saveSale);
 
-  $("clearAllBtn").addEventListener("click", openConfirm);
+  $("copyBtn").addEventListener("click", function () {
+    if (!lastCalc) return;
+    var c = lastCalc;
+    var res = RESOURCES[c.resource] || RESOURCES.cotton;
+    var totalCost = c.amount * c.buy;
+    var revenue = c.produced * c.sell * (1 - c.tax / 100);
+    copyText([
+      "Albion — Переработка",
+      res.short + " → " + res.out + " · T" + c.tier + (c.focus ? " · с фокусом" : "") + (c.premium ? " · премиум" : ""),
+      "Сырья: " + fmtInt.format(c.amount) + " → изделий: " + fmtInt.format(c.produced),
+      "Затраты: " + fmtInt.format(totalCost) + " серебра",
+      "Доход (после налога " + c.tax + "%): " + fmtInt.format(revenue) + " серебра",
+      "Прибыль: " + formatProfit(c.profit) + " серебра",
+      "Рентабельность: " + fmtDec.format(c.margin) + "%"
+    ].join("\n"));
+  });
+
+  $("clearAllBtn").addEventListener("click", function () { openConfirm("fabric"); });
   $("modalCancel").addEventListener("click", closeConfirm);
-  $("modalConfirm").addEventListener("click", clearAll);
+  $("modalConfirm").addEventListener("click", function () {
+    if (confirmTarget === "cloak") { cloakClearAll(); } else { clearAll(); }
+  });
   $("confirmModal").addEventListener("click", function (event) {
     if (event.target === this) closeConfirm();
   });
   document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && !$("confirmModal").hidden) closeConfirm();
+    if ($("confirmModal").hidden) return;
+    if (event.key === "Escape") { closeConfirm(); return; }
+    if (event.key === "Tab") {
+      var items = [$("modalCancel"), $("modalConfirm")];
+      var idx = items.indexOf(document.activeElement);
+      if (event.shiftKey && idx <= 0) { event.preventDefault(); items[items.length - 1].focus(); }
+      else if (!event.shiftKey && idx === items.length - 1) { event.preventDefault(); items[0].focus(); }
+    }
   });
 
+  applySettings(loadSettings());
   applyResourceLabels();
   sales = loadSales();
   renderHistory();
   renderStats();
   calculate(false);
+
+  /* ---------- TABS ---------- */
+  var tabList = document.getElementById("mainTabs");
+  var tabButtons = Array.prototype.slice.call(tabList.querySelectorAll(".tab-btn"));
+
+  function selectTab(btn, moveFocus) {
+    tabButtons.forEach(function (b) {
+      var on = b === btn;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+      b.tabIndex = on ? 0 : -1;
+    });
+    $("tabFabric").hidden = btn.dataset.tab !== "fabric";
+    $("tabCloak").hidden = btn.dataset.tab !== "cloak";
+    if (moveFocus) btn.focus();
+  }
+
+  tabList.addEventListener("click", function (event) {
+    var btn = event.target.closest(".tab-btn");
+    if (!btn || btn.classList.contains("active")) return;
+    selectTab(btn, false);
+  });
+
+  tabList.addEventListener("keydown", function (event) {
+    var i = tabButtons.indexOf(document.activeElement);
+    if (i < 0) return;
+    var next = null;
+    if (event.key === "ArrowRight") next = tabButtons[(i + 1) % tabButtons.length];
+    else if (event.key === "ArrowLeft") next = tabButtons[(i - 1 + tabButtons.length) % tabButtons.length];
+    else if (event.key === "Home") next = tabButtons[0];
+    else if (event.key === "End") next = tabButtons[tabButtons.length - 1];
+    if (next) {
+      event.preventDefault();
+      selectTab(next, true);
+    }
+  });
+
+  /* ---------- aria-pressed у групп выбора (материал / тир) ---------- */
+  function syncPressed(group) {
+    var btns = group.querySelectorAll(".res");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].setAttribute("aria-pressed", btns[i].classList.contains("active") ? "true" : "false");
+    }
+  }
+  ["resourceSwitch", "tierSwitch"].forEach(function (id) {
+    var group = $(id);
+    syncPressed(group);
+    if (window.MutationObserver) {
+      new MutationObserver(function () { syncPressed(group); })
+        .observe(group, { attributes: true, attributeFilter: ["class"], subtree: true });
+    }
+  });
+
+  /* ---------- VALIDATION: no negative numbers anywhere ---------- */
+  document.querySelectorAll('input[type="number"]').forEach(function (input) {
+    input.addEventListener("input", function () {
+      if (this.value !== "" && num(this.value) < 0) this.value = 0;
+    });
+  });
+
+  /* ================= CLOAK CALCULATOR ================= */
+  var cloakLast = null;
+
+  /* ---------- CLOAK SALES HISTORY (localStorage) ---------- */
+  var CLOAK_STORE_KEY = "albion.cloak.sales.v1";
+
+  function loadCloakSales() {
+    try {
+      var raw = window.localStorage.getItem(CLOAK_STORE_KEY);
+      if (!raw) return [];
+      var data = JSON.parse(raw);
+      if (!Array.isArray(data)) return [];
+      return data.filter(function (item) {
+        return item && typeof item === "object" && isFinite(Number(item.batchProfit));
+      });
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function persistCloak() {
+    try {
+      window.localStorage.setItem(CLOAK_STORE_KEY, JSON.stringify(cloakSales));
+      return true;
+    } catch (e) {
+      showToast("⚠️ Не удалось сохранить данные в браузере", true);
+      return false;
+    }
+  }
+
+  function cloakMakeId() {
+    return "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function cloakRenderHistory() {
+    var body = $("cloakHistoryBody");
+    body.innerHTML = "";
+
+    var hasSales = cloakSales.length > 0;
+    $("cloakHistoryEmpty").hidden = hasSales;
+    $("cloakHistoryWrap").hidden = !hasSales;
+    $("cloakClearRow").hidden = !hasSales;
+    setText($("cHistCount"), cloakSales.length + " " + plural(cloakSales.length, ["запись", "записи", "записей"]));
+
+    cloakSales.forEach(function (sale) {
+      var tr = document.createElement("tr");
+
+      var dateCell = makeCell("Дата");
+      dateCell.appendChild(makeTime(sale.date));
+      tr.appendChild(dateCell);
+
+      var batchCell = makeCell("Партия");
+      var batchVal = document.createElement("span");
+      batchVal.className = "num";
+      batchVal.textContent = fmtInt.format(Number(sale.batch) || 0) + " шт.";
+      batchCell.appendChild(batchVal);
+      if (sale.premium) {
+        var tag = document.createElement("span");
+        tag.className = "res-tag";
+        tag.textContent = "⭐ премиум";
+        batchCell.appendChild(tag);
+      }
+      tr.appendChild(batchCell);
+
+      var costCell = makeCell("Себестоимость");
+      var costVal = document.createElement("span");
+      costVal.className = "num";
+      costVal.textContent = fmtInt.format((Number(sale.totalCraftCost) || 0) * (Number(sale.batch) || 1)) + " с";
+      costCell.appendChild(costVal);
+      tr.appendChild(costCell);
+
+      var profitValue = Number(sale.batchProfit) || 0;
+      var profitCell = makeCell("Прибыль");
+      var profitVal = document.createElement("span");
+      profitVal.className = "num " + (profitValue >= 0 ? "profit" : "loss");
+      profitVal.textContent = formatProfit(profitValue) + " с";
+      profitCell.appendChild(profitVal);
+      tr.appendChild(profitCell);
+
+      var roiCell = makeCell("ROI");
+      var roiVal = document.createElement("span");
+      roiVal.className = "num " + (Number(sale.roi) >= 0 ? "profit" : "loss");
+      roiVal.textContent = fmtDec.format(Number(sale.roi) || 0) + "%";
+      roiCell.appendChild(roiVal);
+      tr.appendChild(roiCell);
+
+      var actionsCell = makeCell("");
+      actionsCell.className = "col-actions";
+      var del = document.createElement("button");
+      del.type = "button";
+      del.className = "btn-del";
+      del.title = "Удалить запись";
+      del.setAttribute("aria-label", "Удалить запись от " + formatDate(sale.date));
+      del.textContent = "🗑️";
+      del.addEventListener("click", function () { cloakDeleteSale(sale.id); });
+      actionsCell.appendChild(del);
+      tr.appendChild(actionsCell);
+
+      body.appendChild(tr);
+    });
+  }
+
+  function cloakRenderStats() {
+    var count = cloakSales.length;
+    var cloaks = 0;
+    var profit = 0;
+    var roiSum = 0;
+
+    cloakSales.forEach(function (s) {
+      cloaks += Number(s.batch) || 0;
+      profit += Number(s.batchProfit) || 0;
+      roiSum += Number(s.roi) || 0;
+    });
+
+    var avgPerCloak = cloaks > 0 ? profit / cloaks : 0;
+    var avgRoi = count > 0 ? roiSum / count : 0;
+
+    animateNumber($("cStatCount"), count, function (v) { return fmtInt.format(v); });
+    animateNumber($("cStatCloaks"), cloaks, function (v) { return fmtInt.format(v); });
+    animateNumber($("cStatProfit"), profit, function (v) { return fmtInt.format(v) + " серебра"; });
+    animateNumber($("cStatAvg"), avgPerCloak, function (v) { return fmtInt.format(v) + " серебра"; });
+    animateNumber($("cStatRoi"), avgRoi, function (v) { return fmtDec.format(v) + "%"; });
+
+    setSign($("cStatProfit"), profit);
+    setSign($("cStatAvg"), avgPerCloak);
+    setSign($("cStatRoi"), avgRoi);
+
+    updateOverallSummary();
+  }
+
+  function cloakSaveSale() {
+    if (!cloakLast) return;
+
+    cloakSales.unshift({
+      id: cloakMakeId(),
+      date: new Date().toISOString(),
+      materialsCost: cloakLast.materialsCost,
+      craftingTax: cloakLast.craftingTax,
+      totalCraftCost: cloakLast.totalCraftCost,
+      netSellPrice: cloakLast.netSellPrice,
+      netProfit: cloakLast.netProfit,
+      roi: cloakLast.roi,
+      batch: cloakLast.batch,
+      batchProfit: cloakLast.batchProfit,
+      premium: $("cloakPremium").checked
+    });
+
+    if (!persistCloak()) return;
+    cloakRenderHistory();
+    cloakRenderStats();
+    showToast("✅ Крафт сохранён");
+  }
+
+  function cloakDeleteSale(id) {
+    cloakSales = cloakSales.filter(function (item) { return item.id !== id; });
+    persistCloak();
+    cloakRenderHistory();
+    cloakRenderStats();
+    showToast("🗑️ Запись удалена");
+  }
+
+  function cloakClearAll() {
+    cloakSales = [];
+    try { window.localStorage.removeItem(CLOAK_STORE_KEY); } catch (e) { /* хранилище недоступно */ }
+    cloakRenderHistory();
+    cloakRenderStats();
+    closeConfirm();
+    showToast("🧹 История очищена");
+  }
+
+  function cloakShowEmpty() {
+    cloakLast = null;
+    $("cloakEmptyState").hidden = false;
+    $("cloakResultsGrid").hidden = true;
+    $("cloakResultsGrid").classList.remove("in");
+    $("cloakBreakdown").hidden = true;
+    $("cloakTipBlock").hidden = true;
+    $("cloakSaveRow").hidden = true;
+    $("cloakChips").innerHTML = "";
+  }
+
+  function renderCloakBreakdown(parts) {
+    var wrap = $("cloakBreakdown");
+    var list = $("cloakBreakdownList");
+    var rows = [];
+
+    if (parts.cloakCost > 0) rows.push(["Обычный плащ", parts.cloakCost]);
+    if (parts.heartCost > 0) rows.push(["Сердце", parts.heartCost]);
+    if (parts.bannerCost > 0) rows.push(["Знамя", parts.bannerCost]);
+    if (parts.artifactCost > 0) rows.push(["Реликвии (стек 96)", parts.artifactCost]);
+    if (parts.soulsCost > 0) rows.push(["Души (стек 96)", parts.soulsCost]);
+    if (parts.runesCost > 0) rows.push(["Руны (стек 96)", parts.runesCost]);
+    rows.push(["Налог на крафт", parts.craftingTax]);
+
+    list.innerHTML = rows.map(function (row) {
+      return '<div class="breakdown-row"><span class="name">' + row[0] + '</span><span class="num">' +
+        fmtInt.format(row[1]) + " с</span></div>";
+    }).join("");
+
+    wrap.hidden = false;
+  }
+
+  function cloakCalculate(animate) {
+    var cloakPrice = num($("cloakPrice").value);
+
+    // Сердце и Знамя — всегда ровно по 1 шт. на плащ
+    var heartPrice = num($("heartPrice").value);
+    var bannerPrice = num($("bannerPrice").value);
+
+    // Души, Руны и Артефакты/Реликвии на зачарование расходуются фиксированно — по 96 шт.,
+    // но вводятся сразу ценой за весь стек 96, поэтому дальше без умножения.
+    var artifactPrice = num($("artifactPrice").value);
+    var soulsPrice = num($("soulsPrice").value);
+    var runesPrice = num($("runesPrice").value);
+
+    var craftingFee = Math.max(0, num($("craftingFee").value));
+    var sellPrice = Math.max(0, num($("cloakSellPrice").value));
+    var marketTax = Math.max(0, num($("cloakMarketTax").value));
+    var batch = Math.max(1, Math.floor(num($("cloakBatch").value)) || 1);
+
+    if (sellPrice <= 0) {
+      cloakShowEmpty();
+      saveSettings();
+      return;
+    }
+
+    var cloakCost = cloakPrice; // количество базового плаща всегда = 1
+    var heartCost = heartPrice;
+    var bannerCost = bannerPrice;
+    var artifactCost = artifactPrice;
+    var soulsCost = soulsPrice;
+    var runesCost = runesPrice;
+
+    // 1. Реальная стоимость материалов — сумма всех закупленных компонентов рецепта
+    var materialsCost = cloakCost + heartCost + bannerCost + artifactCost + soulsCost + runesCost;
+    // 2. Базовая стоимость для налога на крафт = стоимость материалов (станционный сбор
+    //    в Albion считается именно от ценности расходуемых ресурсов)
+    var craftingTax = materialsCost * (craftingFee / 100);
+    var totalCraftCost = materialsCost + craftingTax;
+
+    var netSellPrice = sellPrice * (1 - marketTax / 100);
+    var netProfit = netSellPrice - totalCraftCost;
+    var roi = totalCraftCost > 0 ? (netProfit / totalCraftCost) * 100 : 0;
+    var batchProfit = netProfit * batch;
+
+    cloakLast = {
+      materialsCost: materialsCost, craftingTax: craftingTax, totalCraftCost: totalCraftCost,
+      netSellPrice: netSellPrice, netProfit: netProfit, roi: roi, batch: batch, batchProfit: batchProfit
+    };
+
+    var wasHidden = $("cloakResultsGrid").hidden;
+    $("cloakEmptyState").hidden = true;
+    $("cloakResultsGrid").hidden = false;
+    $("cloakTipBlock").hidden = false;
+    $("cloakSaveRow").hidden = false;
+
+    if (wasHidden) {
+      $("cloakResultsGrid").classList.remove("in");
+      void $("cloakResultsGrid").offsetWidth;
+      $("cloakResultsGrid").classList.add("in");
+    }
+
+    var setVal = function (el, target, formatter) {
+      if (!animate) {
+        el.dataset.value = target;
+        el.textContent = formatter(target);
+      } else {
+        animateNumber(el, target, formatter);
+      }
+    };
+
+    setVal($("cVCost"), totalCraftCost, function (v) { return fmtInt.format(v); });
+    setVal($("cVRevenue"), netSellPrice, function (v) { return fmtInt.format(v); });
+    setVal($("cVProfit"), netProfit, function (v) { return fmtInt.format(v); });
+    setVal($("cVBatchCost"), totalCraftCost * batch, function (v) { return fmtInt.format(v); });
+    setVal($("cVBatchProfit"), batchProfit, function (v) { return fmtInt.format(v); });
+
+    $("cVRoi").textContent = fmtDec.format(roi) + "%";
+    $("cBatchLabel").textContent = batch;
+
+    var profitPositive = netProfit >= 0;
+    $("cCardProfit").classList.toggle("pos", profitPositive);
+    $("cCardProfit").classList.toggle("neg", !profitPositive);
+    $("cIProfit").textContent = profitPositive ? "✅" : "⚠️";
+
+    $("cCardRoi").classList.toggle("pos", roi >= 10);
+    $("cCardRoi").classList.toggle("neg", roi < 10);
+
+    var batchPositive = batchProfit >= 0;
+    $("cCardBatch").classList.toggle("pos", batchPositive);
+    $("cCardBatch").classList.toggle("neg", !batchPositive);
+
+    setText($("cSCost"), "серебра · материалы " + fmtInt.format(materialsCost) + " + налог " + fmtInt.format(craftingTax));
+    setText($("cSRevenue"), "серебра · налог на продажу " + marketTax + "%");
+    setText($("cSBatchProfit"), "серебра суммарно · " + batch + " шт.");
+
+    $("cloakChips").innerHTML = [
+      '<li class="chip gold">Плащ</li>',
+      '<li class="chip">Налог на крафт ' + craftingFee + "%</li>",
+      '<li class="chip">Налог на продажу ' + marketTax + "%</li>"
+    ].join("");
+
+    renderCloakBreakdown({
+      cloakCost: cloakCost, heartCost: heartCost, bannerCost: bannerCost,
+      artifactCost: artifactCost, soulsCost: soulsCost,
+      runesCost: runesCost, craftingTax: craftingTax
+    });
+
+    var tipText;
+    if (roi < 10) {
+      tipText = "Рентабельность " + fmtDec.format(roi) + "% — крафт невыгоден. Поищите материалы дешевле или дождитесь цены продажи повыше.";
+    } else if (roi >= 28) {
+      tipText = "Рентабельность " + fmtDec.format(roi) + "% — отличная выгода! Можно смело брать в работу.";
+    } else {
+      tipText = "Рентабельность " + fmtDec.format(roi) + "% — крафт в пределах нормы, но не выдающийся. Сравните с альтернативными рецептами.";
+    }
+    $("cloakTipText").textContent = tipText;
+
+    if (wasHidden) {
+      $("cloakTipBlock").style.animation = "none";
+      void $("cloakTipBlock").offsetWidth;
+      $("cloakTipBlock").style.animation = "";
+    }
+
+    if (animate) {
+      announce("Прибыль с одного плаща " + formatProfit(netProfit) + " серебра, ROI " + fmtDec.format(roi) + "%. " + tipText);
+    }
+    saveSettings();
+  }
+
+  var CLOAK_TAX = { normal: 10.5, premium: 6.5 };
+
+  function cloakResetAll() {
+    $("cloakPrice").value = "0";
+    $("heartPrice").value = "0";
+    $("bannerPrice").value = "0";
+    $("artifactPrice").value = "0";
+    $("soulsPrice").value = "0";
+    $("runesPrice").value = "0";
+    $("craftingFee").value = "4";
+    $("cloakSellPrice").value = "0";
+    $("cloakPremium").checked = false;
+    $("cloakMarketTax").value = CLOAK_TAX.normal;
+    $("cloakBatch").value = "1";
+    cloakCalculate(false);
+    $("cloakPrice").focus();
+  }
+
+  [
+    "cloakPrice", "heartPrice", "bannerPrice",
+    "artifactPrice", "soulsPrice", "runesPrice",
+    "craftingFee", "cloakSellPrice", "cloakMarketTax", "cloakBatch"
+  ].forEach(function (id) {
+    $(id).addEventListener("input", function () { cloakCalculate(true); });
+    $(id).addEventListener("change", function () { cloakCalculate(true); });
+  });
+
+  $("cloakPremium").addEventListener("change", function () {
+    $("cloakMarketTax").value = this.checked ? CLOAK_TAX.premium : CLOAK_TAX.normal;
+    cloakCalculate(true);
+  });
+
+  $("cloakResetBtn").addEventListener("click", cloakResetAll);
+  $("cloakSaveBtn").addEventListener("click", cloakSaveSale);
+  $("cloakCopyBtn").addEventListener("click", function () {
+    if (!cloakLast) return;
+    var c = cloakLast;
+    var lines = [
+      "Albion — Плащ" + ($("cloakPremium").checked ? " · премиум" : ""),
+      "Себестоимость (1 шт.): " + fmtInt.format(c.totalCraftCost) + " серебра (материалы " + fmtInt.format(c.materialsCost) + " + налог на крафт " + fmtInt.format(c.craftingTax) + ")",
+      "Чистая выручка (1 шт.): " + fmtInt.format(c.netSellPrice) + " серебра",
+      "Прибыль (1 шт.): " + formatProfit(c.netProfit) + " серебра",
+      "ROI: " + fmtDec.format(c.roi) + "%"
+    ];
+    if (c.batch > 1) {
+      lines.push("Партия " + fmtInt.format(c.batch) + " шт.: себестоимость " + fmtInt.format(c.totalCraftCost * c.batch) + " серебра, суммарная прибыль " + formatProfit(c.batchProfit) + " серебра");
+    }
+    copyText(lines.join("\n"));
+  });
+  $("cloakClearAllBtn").addEventListener("click", function () { openConfirm("cloak"); });
+
+  cloakSales = loadCloakSales();
+  cloakRenderHistory();
+  cloakRenderStats();
+  cloakCalculate(false);
+
+  /* ---------- SCROLL-TO-TOP ---------- */
+  (function setupTopBtn() {
+    var btn = $("topBtn");
+    if (!btn) return;
+    window.addEventListener("scroll", function () {
+      btn.classList.toggle("show", window.scrollY > 420);
+    }, { passive: true });
+    btn.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  })();
+
+  /* ---------- AMBIENT EMBER PARTICLES ---------- */
+  (function spawnEmbers() {
+    var host = $("embers");
+    if (!host || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    var count = window.innerWidth < 640 ? 10 : 18;
+    for (var i = 0; i < count; i++) {
+      var ember = document.createElement("span");
+      ember.className = "ember";
+      var size = 2 + Math.random() * 3;
+      var left = Math.random() * 100;
+      var duration = 9 + Math.random() * 10;
+      var delay = Math.random() * 14;
+      var drift = (Math.random() * 60 - 30).toFixed(0) + "px";
+
+      ember.style.width = size + "px";
+      ember.style.height = size + "px";
+      ember.style.left = left + "%";
+      ember.style.animationDuration = duration + "s";
+      ember.style.animationDelay = "-" + delay + "s";
+      ember.style.setProperty("--drift", drift);
+
+      host.appendChild(ember);
+    }
+  })();
 })();
 </script>
 </body>
